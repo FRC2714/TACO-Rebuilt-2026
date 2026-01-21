@@ -59,6 +59,7 @@ public final class Configs {
           .positionWrappingInputRange(0, turningFactor);
     }
   }
+
   public static final class Intake {
     public static final SparkFlexConfig rollerConfig = new SparkFlexConfig();
     public static final SparkFlexConfig pivotConfig = new SparkFlexConfig();
@@ -96,5 +97,6 @@ public final class Configs {
           .idleMode(IdleMode.kCoast)
           .smartCurrentLimit(40)
           .voltageCompensation(12);
+    }
+  }
 }
-  }}

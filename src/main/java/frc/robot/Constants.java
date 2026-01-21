@@ -120,7 +120,6 @@ public final class Constants {
       public static final double kIntake = 69;
       public static final double kExtake = 90;
       public static final double kScore = 75;
+    }
   }
-}
-
 }
