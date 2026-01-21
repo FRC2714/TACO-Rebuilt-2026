@@ -15,11 +15,11 @@ import frc.robot.Constants.Intake.PivotSetpoints;
 import frc.robot.Constants.Intake.RollerSetpoints;
 
 public class Intake extends SubsystemBase {
-  private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId, MotorType.kBrushless);
+//   private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId, MotorType.kBrushless);
 
-  private AbsoluteEncoder m_pivotEncoder = m_pivot.getAbsoluteEncoder();
+//   private AbsoluteEncoder m_pivotEncoder = m_pivot.getAbsoluteEncoder();
 
-  private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
+//   private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
 
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
 
@@ -39,8 +39,8 @@ public class Intake extends SubsystemBase {
 
   public Intake() {
     // Constructor code here
-    m_pivot.configure(
-        Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // m_pivot.configure(
+    //     Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_roller.configure(
         Configs.Intake.rollerConfig,
         ResetMode.kResetSafeParameters,
@@ -86,13 +86,13 @@ public class Intake extends SubsystemBase {
       default:
         return;
     }
-    m_pivotController.setSetpoint(targetPosition, ControlType.kPosition);
+    // m_pivotController.setSetpoint(targetPosition, ControlType.kPosition);
   }
 
   public Command intakeCommand() {
     return this.run(
         () -> {
-          setPivot(PivotSetpoints.INTAKE);
+        //  setPivot(PivotSetpoints.INTAKE);
           setRollerSpeed(RollerSetpoints.INTAKE);
         });
   }
@@ -101,7 +101,7 @@ public class Intake extends SubsystemBase {
     return this.run(
         () -> {
           setRollerSpeed(RollerSetpoints.EXTAKE);
-          setPivot(PivotSetpoints.EXTAKE);
+        //  setPivot(PivotSetpoints.EXTAKE);
         });
   }
 
@@ -109,7 +109,7 @@ public class Intake extends SubsystemBase {
     return this.run(
         () -> {
           setRollerSpeed(RollerSetpoints.SCORE);
-          setPivot(PivotSetpoints.SCORE);
+        //  setPivot(PivotSetpoints.SCORE);
         });
   }
 
@@ -117,7 +117,8 @@ public class Intake extends SubsystemBase {
     return this.run(
         () -> {
           setRollerSpeed(RollerSetpoints.STOP);
-          setPivot(PivotSetpoints.STOW);
+        //  setPivot(PivotSetpoints.STOW);
         });
   }
+
 }
