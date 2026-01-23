@@ -26,8 +26,7 @@ public class Intake extends SubsystemBase {
 
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
   
-  private SparkFlex motor;
-  private SparkSim motorSim;
+  private SparkSim rollerSim;
  
   private enum PivotSetpoints {
     STOW,
@@ -52,9 +51,8 @@ public class Intake extends SubsystemBase {
         Configs.Intake.rollerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    motor = new SparkFlex(1, MotorType.kBrushless);
     DCMotor motorModel = DCMotor.getNEO(1);
-    motorSim = new SparkSim(motor, motorModel);
+    rollerSim = new SparkSim(m_roller, motorModel);
   }
 
   private void setRollerSpeed(RollerSetpoints setpoint) {
@@ -133,11 +131,11 @@ public class Intake extends SubsystemBase {
 
   public void simulationPeriodic() {
   // Example: simulate velocity based on applied output
-  double appliedOutput = motor.getAppliedOutput();
+  double appliedOutput = m_roller.getAppliedOutput();
 
-  motorSim.setVelocity(appliedOutput * 5000); // fake RPM model
-  motorSim.setBusVoltage(12.0);
-  motorSim.setMotorCurrent(Math.abs(appliedOutput) * 40);
+  rollerSim.setVelocity(appliedOutput * 5000); // fake RPM model
+  rollerSim.setBusVoltage(12.0);
+  rollerSim.setMotorCurrent(Math.abs(appliedOutput) * 40);
   
 }
 
