@@ -4,12 +4,17 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkSim;
+
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.Intake.PivotSetpoints;
 import frc.robot.Constants.Intake.RollerSetpoints;
+import frc.robot.RobotContainer;
+
 
 public class Intake extends SubsystemBase {
   //   private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId,
@@ -20,7 +25,10 @@ public class Intake extends SubsystemBase {
   //   private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
 
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
-
+  
+  private SparkFlex motor;
+  private SparkSim motorSim;
+ 
   private enum PivotSetpoints {
     STOW,
     INTAKE,
@@ -44,6 +52,9 @@ public class Intake extends SubsystemBase {
         Configs.Intake.rollerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+    motor = new SparkFlex(1, MotorType.kBrushless);
+    DCMotor motorModel = DCMotor.getNEO(1);
+    motorSim = new SparkSim(motor, motorModel);
   }
 
   private void setRollerSpeed(RollerSetpoints setpoint) {
@@ -119,4 +130,15 @@ public class Intake extends SubsystemBase {
           //  setPivot(PivotSetpoints.STOW);
         });
   }
+
+  public void simulationPeriodic() {
+  // Example: simulate velocity based on applied output
+  double appliedOutput = motor.getAppliedOutput();
+
+  motorSim.setVelocity(appliedOutput * 5000); // fake RPM model
+  motorSim.setBusVoltage(12.0);
+  motorSim.setMotorCurrent(Math.abs(appliedOutput) * 40);
+  
+}
+
 }
