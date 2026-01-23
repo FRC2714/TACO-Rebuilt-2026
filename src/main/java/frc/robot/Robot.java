@@ -18,6 +18,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
  * project.
  */
 public class Robot extends TimedRobot {
+
+  private SparkFlex motor;
+  private SparkSim motorSim;
+  
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
@@ -31,7 +35,20 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    motor = new SparkFlex(1, MotorType.kBrushless);
+    motorSim = new SparkSim(motor, null);
   }
+  @Override
+public void simulationPeriodic() {
+  // Example: simulate velocity based on applied output
+  double appliedOutput = motor.getAppliedOutput();
+
+  motorSim.setVelocity(appliedOutput * 5000); // fake RPM model
+  motorSim.setBusVoltage(12.0);
+  motorSim.setMotorCurrent(Math.abs(appliedOutput) * 40);
+  
+}
+
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
