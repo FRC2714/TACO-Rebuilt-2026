@@ -7,11 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkSim;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import edu.wpi.first.math.system.plant.DCMotor;
-
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
