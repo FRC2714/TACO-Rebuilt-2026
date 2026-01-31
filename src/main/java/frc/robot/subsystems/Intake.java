@@ -112,14 +112,7 @@ public class Intake extends SubsystemBase {
         });
   }
 
-  public Command scoreCommand() {
-    return this.run(
-        () -> {
-          setRollerSpeed(RollerSetpoints.SCORE);
-          //  setPivot(PivotSetpoints.SCORE);
-        });
-  }
-
+ 
   public Command stowCommand() {
     return this.run(
         () -> {
