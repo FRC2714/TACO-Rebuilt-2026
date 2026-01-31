@@ -79,7 +79,6 @@ public class RobotContainer {
 
     m_driverController.x().whileTrue(m_intake.intakeCommand());
     m_driverController.y().whileTrue(m_intake.extakeCommand());
-    m_driverController.b().onTrue(m_intake.scoreCommand());
     m_driverController.a().onTrue(m_intake.stowCommand());
   }
 

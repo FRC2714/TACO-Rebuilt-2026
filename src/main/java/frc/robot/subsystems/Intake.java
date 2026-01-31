@@ -30,14 +30,12 @@ public class Intake extends SubsystemBase {
   private enum PivotSetpoints {
     STOW,
     INTAKE,
-    EXTAKE,
-    SCORE
+    EXTAKE
   }
 
   private enum RollerSetpoints {
     INTAKE,
     EXTAKE,
-    SCORE,
     STOP
   }
 
@@ -63,9 +61,6 @@ public class Intake extends SubsystemBase {
       case EXTAKE:
         speed = Constants.Intake.RollerSetpoints.kExtake;
         break;
-      case SCORE:
-        speed = Constants.Intake.RollerSetpoints.kScore;
-        break;
       case STOP:
         speed = Constants.Intake.RollerSetpoints.kStop;
         break;
@@ -87,9 +82,6 @@ public class Intake extends SubsystemBase {
       case EXTAKE:
         targetPosition = Constants.Intake.PivotSetpoints.kExtake;
         break;
-      case SCORE:
-        targetPosition = Constants.Intake.PivotSetpoints.kScore;
-        break;
       default:
         return;
     }
@@ -109,14 +101,6 @@ public class Intake extends SubsystemBase {
         () -> {
           setRollerSpeed(RollerSetpoints.EXTAKE);
           //  setPivot(PivotSetpoints.EXTAKE);
-        });
-  }
-
-  public Command scoreCommand() {
-    return this.run(
-        () -> {
-          setRollerSpeed(RollerSetpoints.SCORE);
-          //  setPivot(PivotSetpoints.SCORE);
         });
   }
 
