@@ -104,10 +104,6 @@ public class Intake extends SubsystemBase {
         });
   }
 
-<<<<<<< HEAD
-=======
- 
->>>>>>> 13a5fa2a210694cb6725dc9f46ae08b3d1567bcf
   public Command stowCommand() {
     return this.run(
         () -> {
