@@ -24,6 +24,8 @@ public class Intake extends SubsystemBase {
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
 
   private SparkSim rollerSim;
+  private SparkFlex motor;
+  private SparkSim motorSim;
 
   private enum PivotSetpoints {
     STOW,
