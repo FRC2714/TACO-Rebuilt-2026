@@ -63,9 +63,6 @@ public class Intake extends SubsystemBase {
       case EXTAKE:
         speed = Constants.Intake.RollerSetpoints.kExtake;
         break;
-      case SCORE:
-        speed = Constants.Intake.RollerSetpoints.kScore;
-        break;
       case STOP:
         speed = Constants.Intake.RollerSetpoints.kStop;
         break;
@@ -86,9 +83,6 @@ public class Intake extends SubsystemBase {
         break;
       case EXTAKE:
         targetPosition = Constants.Intake.PivotSetpoints.kExtake;
-        break;
-      case SCORE:
-        targetPosition = Constants.Intake.PivotSetpoints.kScore;
         break;
       default:
         return;
