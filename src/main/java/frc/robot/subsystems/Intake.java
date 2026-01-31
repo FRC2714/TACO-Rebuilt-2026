@@ -30,14 +30,12 @@ public class Intake extends SubsystemBase {
   private enum PivotSetpoints {
     STOW,
     INTAKE,
-    EXTAKE,
-    SCORE
+    EXTAKE
   }
 
   private enum RollerSetpoints {
     INTAKE,
     EXTAKE,
-    SCORE,
     STOP
   }
 
