@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,14 +16,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Configs;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FeederSetpoints;
 import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
+import frc.robot.Constants.ShooterConstants;
 
 public class Shooter extends SubsystemBase {
-
-  // Initialize flywheel SPARKs. We will use MAXMotion velocity control for the flywheel, so we also
-  // need to
+  
+  // Initialize flywheel SPARKs. We will use MAXMotion velocity control for the flywheel, so we also need to
   // initialize the closed loop controllers and encoders.
   private SparkFlex flywheelMotor =
       new SparkFlex(ShooterConstants.kFlywheelMotorCanId, MotorType.kBrushless);
@@ -31,12 +31,13 @@ public class Shooter extends SubsystemBase {
   DCMotor flywheelGearbox = DCMotor.getNeoVortex(1);
   SparkFlexSim flywheelSim = new SparkFlexSim(flywheelMotor, flywheelGearbox);
 
+
   private SparkFlex flywheelFollowerMotor =
       new SparkFlex(ShooterConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
   private RelativeEncoder flywheelFollowerEncoder = flywheelFollowerMotor.getEncoder();
   DCMotor flywheelFollowerGearbox = DCMotor.getNeoVortex(1);
-  SparkFlexSim flywheelFollowerSim =
-      new SparkFlexSim(flywheelFollowerMotor, flywheelFollowerGearbox);
+  SparkFlexSim flywheelFollowerSim = new SparkFlexSim(flywheelFollowerMotor, flywheelFollowerGearbox);
+
 
   // Initialize feeder SPARK. We will use open loop control for this so we don't need a closed loop
   // controller like above.
@@ -44,6 +45,7 @@ public class Shooter extends SubsystemBase {
       new SparkFlex(ShooterConstants.kFeederMotorCanId, MotorType.kBrushless);
   DCMotor feederGearbox = DCMotor.getNeoVortex(1);
   SparkFlexSim feederSim = new SparkFlexSim(feederMotor, feederGearbox);
+
 
   // Member variables for subsystem state management
   private double flywheelTargetVelocity = 0.0;
@@ -107,18 +109,18 @@ public class Shooter extends SubsystemBase {
   private void setFeederPower(double power) {
     feederMotor.set(power);
   }
-
+  
   /**
    * Command to run the flywheel motors. When the command is interrupted, e.g. the button is
    * released, the motors will stop.
    */
   public Command runFlywheelCommand() {
     return this.startEnd(
-            () -> {
-              this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-            },
-            () -> {
-              this.setFlywheelVelocity(0.0);
+        () -> {
+          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+        },
+        () -> {
+          this.setFlywheelVelocity(0.0);
             })
         .withName("Spinning Up Flywheel");
   }
@@ -129,13 +131,13 @@ public class Shooter extends SubsystemBase {
    */
   public Command runFeederCommand() {
     return this.startEnd(
-            () -> {
-              this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-              this.setFeederPower(FeederSetpoints.kFeed);
+        () -> {
+          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+          this.setFeederPower(FeederSetpoints.kFeed);
             },
             () -> {
-              this.setFlywheelVelocity(0.0);
-              this.setFeederPower(0.0);
+          this.setFlywheelVelocity(0.0);
+          this.setFeederPower(0.0);
             })
         .withName("Feeding");
   }
@@ -146,18 +148,18 @@ public class Shooter extends SubsystemBase {
    */
   public Command runShooterCommand() {
     return this.startEnd(
-            () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm),
+      () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm),
             () -> flywheelMotor.stopMotor())
         .until(isFlywheelSpinning)
         .andThen(
-            this.startEnd(
-                () -> {
-                  this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-                  this.setFeederPower(FeederSetpoints.kFeed);
+      this.startEnd(
+        () -> {
+          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+          this.setFeederPower(FeederSetpoints.kFeed);
                 },
                 () -> {
-                  flywheelMotor.stopMotor();
-                  feederMotor.stopMotor();
+          flywheelMotor.stopMotor();
+          feederMotor.stopMotor();
                 }))
         .withName("Shooting");
   }
