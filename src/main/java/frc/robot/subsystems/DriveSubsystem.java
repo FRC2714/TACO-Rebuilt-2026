@@ -3,10 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -17,7 +17,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.LimelightConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.reduxrobotics.sensors.canandgyro.Canandgyro;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -42,18 +47,35 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+  private final Canandgyro m_gyro = new Canandgyro(0);
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-      DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
-      new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-      });
+  // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
+  //     DriveConstants.kDriveKinematics,
+  //     Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
+  //     new SwerveModulePosition[] {
+  //         m_frontLeft.getPosition(),
+  //         m_frontRight.getPosition(),
+  //         m_rearLeft.getPosition(),
+  //         m_rearRight.getPosition()
+  //     });
+    StructPublisher<Pose2d> publisher =
+    NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
+
+    public SwerveDrivePoseEstimator m_poseEstimator = 
+      new SwerveDrivePoseEstimator(
+          DriveConstants.kDriveKinematics,
+          Rotation2d.fromDegrees(getHeading()),
+          new SwerveModulePosition[]{
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_rearLeft.getPosition(),
+            m_rearRight.getPosition(),
+          },
+          new Pose2d(),
+          LimelightConstants.m_stateStdDevs,
+          LimelightConstants.m_visionStdDevs);
+         
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -64,14 +86,15 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(
-        Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        });
+    m_poseEstimator.update(
+      m_gyro.getRotation2d(),
+      new SwerveModulePosition[]{
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+      });
+    
   }
 
   /**
@@ -80,7 +103,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_poseEstimator.getEstimatedPosition();
   }
 
   /**
@@ -89,8 +112,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(
-        Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
+    m_poseEstimator.resetPosition(
+        Rotation2d.fromDegrees(getHeading()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -118,7 +141,7 @@ public class DriveSubsystem extends SubsystemBase {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)))
+                Rotation2d.fromDegrees(getHeading()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -162,7 +185,19 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
+   Pose2d pose = new Pose2d();
+
+   m_gyro.setYaw(pose.getRotation().getRotations());
+   m_poseEstimator.resetRotation(pose.getRotation());
+   m_poseEstimator.resetPosition(
+    pose.getRotation(),
+    new SwerveModulePosition[]{
+      m_frontLeft.getPosition(),
+      m_frontRight.getPosition(),
+      m_rearLeft.getPosition(),
+      m_rearLeft.getPosition()
+    },
+    pose);
   }
 
   /**
@@ -171,7 +206,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)).getDegrees();
+    return Units.rotationsToDegrees(m_gyro.getYaw());
   }
 
   /**
@@ -180,6 +215,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate(IMUAxis.kZ) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 }
+
