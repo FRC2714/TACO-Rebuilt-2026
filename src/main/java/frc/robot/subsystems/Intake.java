@@ -97,8 +97,7 @@ public class Intake extends SubsystemBase {
         });
   }
 
-  public Command 
-  extakeCommand() {
+  public Command extakeCommand() {
     return this.run(
         () -> {
           setRollerSpeed(RollerSetpoints.EXTAKE);
