@@ -97,6 +97,7 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 6780;
+    public static final double kVortexKv = 565; // rpm/V
   }
 
   public static final class Intake {
@@ -118,6 +119,21 @@ public final class Constants {
       public static final double kStow = 15.2;
       public static final double kIntake = 69;
       public static final double kExtake = 90;
+    }
+  }
+
+  public static final class ShooterConstants {
+    public static final int kFeederMotorCanId = 5; // TODO
+    public static final int kFlywheelMotorCanId = 6; // TODO
+    public static final int kFlywheelFollowerMotorCanId = 7; // TODO
+
+    public static final class FeederSetpoints {
+      public static final double kFeed = 0.95;
+    }
+
+    public static final class FlywheelSetpoints {
+      public static final double kShootRpm = 5000;
+      public static final double kVelocityTolerance = 100;
     }
   }
 }

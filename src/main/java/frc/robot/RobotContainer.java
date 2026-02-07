@@ -25,6 +25,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 import java.util.List;
 
 /*
@@ -38,6 +39,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   private final Intake m_intake = new Intake();
+  private final Shooter m_shooter = new Shooter();
 
   // The driver's controller
   CommandXboxController m_driverController =
@@ -80,6 +82,7 @@ public class RobotContainer {
     m_driverController.x().whileTrue(m_intake.intakeCommand());
     m_driverController.y().whileTrue(m_intake.extakeCommand());
     m_driverController.a().onTrue(m_intake.stowCommand());
+    m_driverController.b().onTrue(m_shooter.runShooterCommand());
   }
 
   /**
