@@ -4,10 +4,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -77,6 +82,13 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.05;
+  }
+
+  public static final class LimelightConstants{
+    public static final Matrix<N3, N1> m_stateStdDevs =
+      VecBuilder.fill(0.15, 0.15, 0.00001);//TODO
+    public static final Matrix<N3, N1> m_visionStdDevs =
+      VecBuilder.fill(0.00001, 0.00001, 999999);
   }
 
   public static final class AutoConstants {
