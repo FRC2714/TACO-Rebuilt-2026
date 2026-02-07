@@ -3,12 +3,14 @@ package frc.robot.subsystems;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,14 +28,23 @@ public class Shooter extends SubsystemBase {
       new SparkFlex(ShooterConstants.kFlywheelMotorCanId, MotorType.kBrushless);
   private SparkClosedLoopController flywheelController = flywheelMotor.getClosedLoopController();
   private RelativeEncoder flywheelEncoder = flywheelMotor.getEncoder();
+  DCMotor flywheelGearbox = DCMotor.getNeoVortex(1);
+  SparkFlexSim flywheelSim = new SparkFlexSim(flywheelMotor, flywheelGearbox);
+
 
   private SparkFlex flywheelFollowerMotor =
       new SparkFlex(ShooterConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
+  DCMotor flywheelFollowerGearbox = DCMotor.getNeoVortex(1);
+  SparkFlexSim flywheelFollowerSim = new SparkFlexSim(flywheelFollowerMotor, flywheelFollowerGearbox);
+
 
   // Initialize feeder SPARK. We will use open loop control for this so we don't need a closed loop
   // controller like above.
   private SparkFlex feederMotor =
       new SparkFlex(ShooterConstants.kFeederMotorCanId, MotorType.kBrushless);
+  DCMotor feederGearbox = DCMotor.getNeoVortex(1);
+  SparkFlexSim feederSim = new SparkFlexSim(feederMotor, feederGearbox);
+  
 
   // Member variables for subsystem state management
   private double flywheelTargetVelocity = 0.0;
