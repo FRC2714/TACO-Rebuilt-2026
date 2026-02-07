@@ -34,6 +34,7 @@ public class Shooter extends SubsystemBase {
 
   private SparkFlex flywheelFollowerMotor =
       new SparkFlex(ShooterConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
+  private RelativeEncoder flywheelFollowerEncoder = flywheelFollowerMotor.getEncoder();
   DCMotor flywheelFollowerGearbox = DCMotor.getNeoVortex(1);
   SparkFlexSim flywheelFollowerSim = new SparkFlexSim(flywheelFollowerMotor, flywheelFollowerGearbox);
 
@@ -44,7 +45,7 @@ public class Shooter extends SubsystemBase {
       new SparkFlex(ShooterConstants.kFeederMotorCanId, MotorType.kBrushless);
   DCMotor feederGearbox = DCMotor.getNeoVortex(1);
   SparkFlexSim feederSim = new SparkFlexSim(feederMotor, feederGearbox);
-  
+
 
   // Member variables for subsystem state management
   private double flywheelTargetVelocity = 0.0;
@@ -173,6 +174,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter | Flywheel | Current", flywheelMotor.getOutputCurrent());
     SmartDashboard.putNumber("Shooter | Flywheel Follower | Applied Output", flywheelFollowerMotor.getAppliedOutput());
     SmartDashboard.putNumber("Shooter | Flywheel Follower | Current", flywheelFollowerMotor.getOutputCurrent());
+  SmartDashboard.putNumber("Shooter | Flywheel Follower | Encoder Velocity", flywheelFollowerEncoder.getVelocity());
 
     SmartDashboard.putNumber("Shooter | Flywheel | Target Velocity", flywheelTargetVelocity);
     SmartDashboard.putNumber("Shooter | Flywheel | Actual Velocity", flywheelEncoder.getVelocity());
@@ -180,5 +182,34 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("Is Flywheel Spinning", isFlywheelSpinning.getAsBoolean());
     SmartDashboard.putBoolean("Is Flywheel Stopped", isFlywheelStopped.getAsBoolean());
   }
+
+  @Override
+  public void simulationPeriodic() {
+    // Simulate flywheel behavior using SparkFlexSim APIs (setVelocity / setMotorCurrent)
+    double flywheelApplied = flywheelMotor.getAppliedOutput();
+    // crude mapping: applied output -> RPM/current
+    flywheelSim.setVelocity(flywheelApplied * 6000.0);
+    flywheelSim.setBusVoltage(12.0);
+    flywheelSim.setMotorCurrent(Math.abs(flywheelApplied) * 40.0);
+
+    double followerApplied = flywheelFollowerMotor.getAppliedOutput();
+    flywheelFollowerSim.setVelocity(followerApplied * 6000.0);
+    flywheelFollowerSim.setBusVoltage(12.0);
+    flywheelFollowerSim.setMotorCurrent(Math.abs(followerApplied) * 40.0);
+
+    double feederApplied = feederMotor.getAppliedOutput();
+    feederSim.setVelocity(feederApplied * 4000.0);
+    feederSim.setBusVoltage(12.0);
+    feederSim.setMotorCurrent(Math.abs(feederApplied) * 20.0);
+
+    // Display simulated values
+    SmartDashboard.putNumber("Shooter | Flywheel | Simulated Velocity", flywheelSim.getVelocity());
+    SmartDashboard.putNumber("Shooter | Flywheel | Simulated Current", flywheelSim.getMotorCurrent());
+    SmartDashboard.putNumber("Shooter | Flywheel Follower | Simulated Velocity", flywheelFollowerSim.getVelocity());
+    SmartDashboard.putNumber("Shooter | Flywheel Follower | Simulated Current", flywheelFollowerSim.getMotorCurrent());
+    SmartDashboard.putNumber("Shooter | Feeder | Simulated Velocity", feederSim.getVelocity());
+    SmartDashboard.putNumber("Shooter | Feeder | Simulated Current", feederSim.getMotorCurrent());
+
+}
 
 }
