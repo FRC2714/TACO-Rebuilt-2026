@@ -87,9 +87,9 @@ public final class Configs {
           .positionWrappingEnabled(true)
           .positionWrappingInputRange(0, 360)
           .maxMotion
-          .maxVelocity(4200 * 360)
+          .cruiseVelocity(4200 * 360)
           .maxAcceleration(6000 * 360)
-          .allowedClosedLoopError(0.5);
+          .allowedProfileError(0.5);
 
       // Configure basic settings of the intake motor
       rollerConfig
