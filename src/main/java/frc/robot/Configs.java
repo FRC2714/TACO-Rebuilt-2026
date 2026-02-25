@@ -22,7 +22,7 @@ public final class Configs {
       double nominalVoltage = 12.0;
       double drivingVelocityFeedForward = nominalVoltage / ModuleConstants.kDriveWheelFreeSpeedRps;
 
-      drivingConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(50);
+      drivingConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(70);
       drivingConfig
           .encoder
           .positionConversionFactor(drivingFactor) // meters
@@ -36,7 +36,7 @@ public final class Configs {
           .feedForward
           .kV(drivingVelocityFeedForward);
 
-      turningConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(20);
+      turningConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(70);
 
       turningConfig
           .absoluteEncoder
@@ -45,8 +45,7 @@ public final class Configs {
           .inverted(true)
           .positionConversionFactor(turningFactor) // radians
           .velocityConversionFactor(turningFactor / 60.0) // radians per second
-          // This applies to REV Through Bore Encoder V2 (use REV_ThroughBoreEncoder for V1):
-          .apply(AbsoluteEncoderConfig.Presets.REV_ThroughBoreEncoderV2);
+          .apply(AbsoluteEncoderConfig.Presets.REV_ThroughBoreEncoder);
 
       turningConfig
           .closedLoop
@@ -90,9 +89,9 @@ public final class Configs {
           .positionWrappingEnabled(true)
           .positionWrappingInputRange(0, 360)
           .maxMotion
-          .maxVelocity(4200 * 360)
+          .cruiseVelocity(4200 * 360)
           .maxAcceleration(6000 * 360)
-          .allowedClosedLoopError(0.5);
+          .allowedProfileError(0.5);
 
       // Configure basic settings of the intake motor
       rollerConfig
