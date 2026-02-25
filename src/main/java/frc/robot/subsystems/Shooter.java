@@ -86,10 +86,16 @@ public class Shooter extends SubsystemBase {
 
   /** Trigger: Is the flywheel spinning at the required velocity? */
   public final Trigger isFlywheelSpinning =
-      new Trigger(() -> isFlywheelAt(5000) || flywheelEncoder.getVelocity() > 5000);
+      new Trigger(
+          () ->
+              isFlywheelAt(FlywheelSetpoints.kShootRpm)
+                  || flywheelEncoder.getVelocity() > FlywheelSetpoints.kShootRpm);
 
   public final Trigger isFlywheelSpinningBackwards =
-      new Trigger(() -> isFlywheelAt(-5000) || flywheelEncoder.getVelocity() < -5000);
+      new Trigger(
+          () ->
+              isFlywheelAt(-FlywheelSetpoints.kShootRpm)
+                  || flywheelEncoder.getVelocity() < -FlywheelSetpoints.kShootRpm);
 
   /** Trigger: Is the flywheel stopped? */
   public final Trigger isFlywheelStopped = new Trigger(() -> isFlywheelAt(0));
