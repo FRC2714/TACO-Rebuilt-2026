@@ -123,16 +123,16 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final int kFeederMotorCanId = 5; // TODO
-    public static final int kFlywheelMotorCanId = 6; // TODO
-    public static final int kFlywheelFollowerMotorCanId = 7; // TODO
+    public static final int kFeederMotorCanId = 5;
+    public static final int kFlywheelMotorCanId = 6;
+    public static final int kFlywheelFollowerMotorCanId = 7;
 
     public static final class FeederSetpoints {
       public static final double kFeed = 0.95;
     }
 
     public static final class FlywheelSetpoints {
-      public static final double kShootRpm = 5000;
+      public static final double kShootRpm = 400;
       public static final double kVelocityTolerance = 100;
     }
   }

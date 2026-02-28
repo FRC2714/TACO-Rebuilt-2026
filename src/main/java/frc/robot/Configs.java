@@ -127,18 +127,20 @@ public final class Configs {
           .p(0.0002)
           .outputRange(-1, 1);
 
-      flywheelConfig
-          .closedLoop
-          .maxMotion
-          // Set MAXMotion parameters for MAXMotion Velocity control
-          .cruiseVelocity(5000)
-          .maxAcceleration(10000)
-          .allowedProfileError(1);
+      //   flywheelConfig
+      //       .closedLoop
+      //       .maxMotion
+      //       // Set MAXMotion parameters for MAXMotion Velocity control
+      //       .cruiseVelocity(2000)
+      //       .maxAcceleration(4000)
+      //       .allowedProfileError(1);
 
       // Constants.NeoMotorConstants.kVortexKv is in rpm/V. feedforward.kV is in V/rpm sort we take
       // the reciprocol.
       flywheelConfig.closedLoop.feedForward.kV(
           nominalVoltage / Constants.NeoMotorConstants.kVortexKv);
+
+    //   flywheelConfig.encoder.velocityConversionFactor(34./46.);
 
       // Configure the follower flywheel motor to follow the main flywheel motor
       flywheelFollowerConfig
