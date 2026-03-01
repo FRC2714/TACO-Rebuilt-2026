@@ -137,10 +137,9 @@ public final class Configs {
 
       // Constants.NeoMotorConstants.kVortexKv is in rpm/V. feedforward.kV is in V/rpm sort we take
       // the reciprocol.
-      flywheelConfig.closedLoop.feedForward.kV(
-          .0018);
+      flywheelConfig.closedLoop.feedForward.kV(.0018);
 
-    //   flywheelConfig.encoder.velocityConversionFactor(34./46.);
+      //   flywheelConfig.encoder.velocityConversionFactor(34./46.);
 
       // Configure the follower flywheel motor to follow the main flywheel motor
       flywheelFollowerConfig
