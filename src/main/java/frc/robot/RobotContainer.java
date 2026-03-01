@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -47,6 +48,10 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    NamedCommands.registerCommand("SCORE", m_shooter.runShooterCommand().withTimeout(5));
+    NamedCommands.registerCommand("INTAKE", m_intake.intakeCommand().withTimeout(5));
+
     // Configure the button bindings
     configureButtonBindings();
 
