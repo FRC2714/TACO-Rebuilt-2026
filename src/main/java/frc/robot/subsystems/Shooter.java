@@ -173,7 +173,7 @@ public class Shooter extends SubsystemBase {
 
     return spinUntilUp.andThen(feederPhase).withName("Shooting");
   }
-
+  
   public Command runShooter() {
     return this.runOnce(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm))
         .until(isFlywheelSpinning)

@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "start-score"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "SCORE"
@@ -13,13 +19,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "start-outpost"
+            "pathName": "score-outpost"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "INTAKE"
+            "name": "WAIT"
           }
         },
         {
