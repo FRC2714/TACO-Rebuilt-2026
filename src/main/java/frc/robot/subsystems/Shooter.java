@@ -12,6 +12,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Configs;
@@ -21,27 +22,26 @@ import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 
 public class Shooter extends SubsystemBase {
 
-  // Initialize flywheel SPARKs. We will use MAXMotion velocity control for the flywheel, so we also
+  // Initialize flywheel SPARKs. We will use MAXMotion velocity control for the
+  // flywheel, so we also
   // need to
   // initialize the closed loop controllers and encoders.
-  private SparkFlex flywheelMotor =
-      new SparkFlex(ShooterConstants.kFlywheelMotorCanId, MotorType.kBrushless);
+  private SparkFlex flywheelMotor = new SparkFlex(ShooterConstants.kFlywheelMotorCanId, MotorType.kBrushless);
   private SparkClosedLoopController flywheelController = flywheelMotor.getClosedLoopController();
   private RelativeEncoder flywheelEncoder = flywheelMotor.getEncoder();
   DCMotor flywheelGearbox = DCMotor.getNeoVortex(1);
   SparkFlexSim flywheelSim = new SparkFlexSim(flywheelMotor, flywheelGearbox);
 
-  private SparkFlex flywheelFollowerMotor =
-      new SparkFlex(ShooterConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
+  private SparkFlex flywheelFollowerMotor = new SparkFlex(ShooterConstants.kFlywheelFollowerMotorCanId,
+      MotorType.kBrushless);
   private RelativeEncoder flywheelFollowerEncoder = flywheelFollowerMotor.getEncoder();
   DCMotor flywheelFollowerGearbox = DCMotor.getNeoVortex(1);
-  SparkFlexSim flywheelFollowerSim =
-      new SparkFlexSim(flywheelFollowerMotor, flywheelFollowerGearbox);
+  SparkFlexSim flywheelFollowerSim = new SparkFlexSim(flywheelFollowerMotor, flywheelFollowerGearbox);
 
-  // Initialize feeder SPARK. We will use open loop control for this so we don't need a closed loop
+  // Initialize feeder SPARK. We will use open loop control for this so we don't
+  // need a closed loop
   // controller like above.
-  private SparkFlex feederMotor =
-      new SparkFlex(ShooterConstants.kFeederMotorCanId, MotorType.kBrushless);
+  private SparkFlex feederMotor = new SparkFlex(ShooterConstants.kFeederMotorCanId, MotorType.kBrushless);
   DCMotor feederGearbox = DCMotor.getNeoVortex(1);
   SparkFlexSim feederSim = new SparkFlexSim(feederMotor, feederGearbox);
 
@@ -85,23 +85,20 @@ public class Shooter extends SubsystemBase {
   }
 
   /** Trigger: Is the flywheel spinning at the required velocity? */
-  public final Trigger isFlywheelSpinning =
-      new Trigger(
-          () ->
-              isFlywheelAt(FlywheelSetpoints.kShootRpm)
-                  || flywheelEncoder.getVelocity() > FlywheelSetpoints.kShootRpm);
+  public final Trigger isFlywheelSpinning = new Trigger(
+      () -> isFlywheelAt(FlywheelSetpoints.kShootRpm)
+          || flywheelEncoder.getVelocity() > FlywheelSetpoints.kShootRpm);
 
-  public final Trigger isFlywheelSpinningBackwards =
-      new Trigger(
-          () ->
-              isFlywheelAt(-FlywheelSetpoints.kShootRpm)
-                  || flywheelEncoder.getVelocity() < -FlywheelSetpoints.kShootRpm);
+  public final Trigger isFlywheelSpinningBackwards = new Trigger(
+      () -> isFlywheelAt(-FlywheelSetpoints.kShootRpm)
+          || flywheelEncoder.getVelocity() < -FlywheelSetpoints.kShootRpm);
 
   /** Trigger: Is the flywheel stopped? */
   public final Trigger isFlywheelStopped = new Trigger(() -> isFlywheelAt(0));
 
   /**
-   * Drive the flywheels to their set velocity. This will use MAXMotion velocity control which will
+   * Drive the flywheels to their set velocity. This will use MAXMotion velocity
+   * control which will
    * allow for a smooth acceleration and deceleration to the mechanism's setpoint.
    */
   private void setFlywheelVelocity(double velocity) {
@@ -115,57 +112,86 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Command to run the flywheel motors. When the command is interrupted, e.g. the button is
+   * Command to run the flywheel motors. When the command is interrupted, e.g. the
+   * button is
    * released, the motors will stop.
    */
   public Command runFlywheelCommand() {
     return this.startEnd(
-            () -> {
-              this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-            },
-            () -> {
-              this.setFlywheelVelocity(0.0);
-            })
+        () -> {
+          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+        },
+        () -> {
+          this.setFlywheelVelocity(0.0);
+        })
         .withName("Spinning Up Flywheel");
   }
 
   /**
-   * Command to run the feeder and flywheel motors. When the command is interrupted, e.g. the button
+   * Command to run the feeder and flywheel motors. When the command is
+   * interrupted, e.g. the button
    * is released, the motors will stop.
    */
   public Command runFeederCommand() {
     return this.startEnd(
-            () -> {
-              this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-              this.setFeederPower(FeederSetpoints.kFeed);
-            },
-            () -> {
-              this.setFlywheelVelocity(0.0);
-              this.setFeederPower(0.0);
-            })
+        () -> {
+          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+          this.setFeederPower(FeederSetpoints.kFeed);
+        },
+        () -> {
+          this.setFlywheelVelocity(0.0);
+          this.setFeederPower(0.0);
+        })
         .withName("Feeding");
   }
 
   /**
-   * Meta-command to operate the shooter. The Flywheel starts spinning up and when it reaches the
+   * Meta-command to operate the shooter. The Flywheel starts spinning up and when
+   * it reaches the
    * desired speed it starts the Feeder.
    */
   public Command runShooterCommand() {
-    return this.startEnd(
-            () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm),
-            () -> flywheelMotor.stopMotor())
-        .until(isFlywheelSpinning)
-        .andThen(
-            this.startEnd(
+    Command spinUntilUp =
+        this.startEnd(
+                () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm),
+                () -> {
+                })
+            .until(isFlywheelSpinning)
+            .withName("SpinUntilUp");
+
+    Command feederPhase =
+        this.startEnd(
                 () -> {
                   this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
                   this.setFeederPower(FeederSetpoints.kFeed);
                 },
                 () -> {
-                  flywheelMotor.stopMotor();
-                  feederMotor.stopMotor();
-                }))
-        .withName("Shooting");
+                  this.setFlywheelVelocity(0.0);
+                  this.setFeederPower(0.0);
+                })
+            .withName("FeederPhase");
+
+    return spinUntilUp.andThen(feederPhase).withName("Shooting");
+  }
+
+  public Command runShooter() {
+    return this.runOnce(
+      () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm)
+      )
+      .until(isFlywheelSpinning)
+      .andThen(
+        this.runOnce(() -> {
+          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+          this.setFeederPower(FeederSetpoints.kFeed);
+        })
+      );
+  }
+
+  public Command stopShooter() {
+    return new InstantCommand(() -> {
+      flywheelMotor.stopMotor();
+      feederMotor.stopMotor();
+    });
   }
 
   @Override
@@ -191,7 +217,8 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    // Simulate flywheel behavior using SparkFlexSim APIs (setVelocity / setMotorCurrent)
+    // Simulate flywheel behavior using SparkFlexSim APIs (setVelocity /
+    // setMotorCurrent)
     double flywheelApplied = flywheelMotor.getAppliedOutput();
     // crude mapping: applied output -> RPM/current
     flywheelSim.setVelocity(flywheelApplied * 6000.0);

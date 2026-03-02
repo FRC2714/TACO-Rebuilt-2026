@@ -90,11 +90,10 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return this.run(
-        () -> {
-          //  setPivot(PivotSetpoints.INTAKE);
-          setRollerSpeed(RollerSetpoints.INTAKE);
-        });
+    return this.startEnd(
+        () -> //  setPivot(PivotSetpoints.INTAKE);
+          setRollerSpeed(RollerSetpoints.INTAKE), () -> m_roller.stopMotor())
+          .withName("Intaking");
   }
 
   public Command extakeCommand() {
