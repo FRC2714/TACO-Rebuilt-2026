@@ -26,22 +26,25 @@ public class Shooter extends SubsystemBase {
   // flywheel, so we also
   // need to
   // initialize the closed loop controllers and encoders.
-  private SparkFlex flywheelMotor = new SparkFlex(ShooterConstants.kFlywheelMotorCanId, MotorType.kBrushless);
+  private SparkFlex flywheelMotor =
+      new SparkFlex(ShooterConstants.kFlywheelMotorCanId, MotorType.kBrushless);
   private SparkClosedLoopController flywheelController = flywheelMotor.getClosedLoopController();
   private RelativeEncoder flywheelEncoder = flywheelMotor.getEncoder();
   DCMotor flywheelGearbox = DCMotor.getNeoVortex(1);
   SparkFlexSim flywheelSim = new SparkFlexSim(flywheelMotor, flywheelGearbox);
 
-  private SparkFlex flywheelFollowerMotor = new SparkFlex(ShooterConstants.kFlywheelFollowerMotorCanId,
-      MotorType.kBrushless);
+  private SparkFlex flywheelFollowerMotor =
+      new SparkFlex(ShooterConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
   private RelativeEncoder flywheelFollowerEncoder = flywheelFollowerMotor.getEncoder();
   DCMotor flywheelFollowerGearbox = DCMotor.getNeoVortex(1);
-  SparkFlexSim flywheelFollowerSim = new SparkFlexSim(flywheelFollowerMotor, flywheelFollowerGearbox);
+  SparkFlexSim flywheelFollowerSim =
+      new SparkFlexSim(flywheelFollowerMotor, flywheelFollowerGearbox);
 
   // Initialize feeder SPARK. We will use open loop control for this so we don't
   // need a closed loop
   // controller like above.
-  private SparkFlex feederMotor = new SparkFlex(ShooterConstants.kFeederMotorCanId, MotorType.kBrushless);
+  private SparkFlex feederMotor =
+      new SparkFlex(ShooterConstants.kFeederMotorCanId, MotorType.kBrushless);
   DCMotor feederGearbox = DCMotor.getNeoVortex(1);
   SparkFlexSim feederSim = new SparkFlexSim(feederMotor, feederGearbox);
 
@@ -85,20 +88,23 @@ public class Shooter extends SubsystemBase {
   }
 
   /** Trigger: Is the flywheel spinning at the required velocity? */
-  public final Trigger isFlywheelSpinning = new Trigger(
-      () -> isFlywheelAt(FlywheelSetpoints.kShootRpm)
-          || flywheelEncoder.getVelocity() > FlywheelSetpoints.kShootRpm);
+  public final Trigger isFlywheelSpinning =
+      new Trigger(
+          () ->
+              isFlywheelAt(FlywheelSetpoints.kShootRpm)
+                  || flywheelEncoder.getVelocity() > FlywheelSetpoints.kShootRpm);
 
-  public final Trigger isFlywheelSpinningBackwards = new Trigger(
-      () -> isFlywheelAt(-FlywheelSetpoints.kShootRpm)
-          || flywheelEncoder.getVelocity() < -FlywheelSetpoints.kShootRpm);
+  public final Trigger isFlywheelSpinningBackwards =
+      new Trigger(
+          () ->
+              isFlywheelAt(-FlywheelSetpoints.kShootRpm)
+                  || flywheelEncoder.getVelocity() < -FlywheelSetpoints.kShootRpm);
 
   /** Trigger: Is the flywheel stopped? */
   public final Trigger isFlywheelStopped = new Trigger(() -> isFlywheelAt(0));
 
   /**
-   * Drive the flywheels to their set velocity. This will use MAXMotion velocity
-   * control which will
+   * Drive the flywheels to their set velocity. This will use MAXMotion velocity control which will
    * allow for a smooth acceleration and deceleration to the mechanism's setpoint.
    */
   private void setFlywheelVelocity(double velocity) {
@@ -112,50 +118,44 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Command to run the flywheel motors. When the command is interrupted, e.g. the
-   * button is
+   * Command to run the flywheel motors. When the command is interrupted, e.g. the button is
    * released, the motors will stop.
    */
   public Command runFlywheelCommand() {
     return this.startEnd(
-        () -> {
-          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-        },
-        () -> {
-          this.setFlywheelVelocity(0.0);
-        })
+            () -> {
+              this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+            },
+            () -> {
+              this.setFlywheelVelocity(0.0);
+            })
         .withName("Spinning Up Flywheel");
   }
 
   /**
-   * Command to run the feeder and flywheel motors. When the command is
-   * interrupted, e.g. the button
+   * Command to run the feeder and flywheel motors. When the command is interrupted, e.g. the button
    * is released, the motors will stop.
    */
   public Command runFeederCommand() {
     return this.startEnd(
-        () -> {
-          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-          this.setFeederPower(FeederSetpoints.kFeed);
-        },
-        () -> {
-          this.setFlywheelVelocity(0.0);
-          this.setFeederPower(0.0);
-        })
+            () -> {
+              this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+              this.setFeederPower(FeederSetpoints.kFeed);
+            },
+            () -> {
+              this.setFlywheelVelocity(0.0);
+              this.setFeederPower(0.0);
+            })
         .withName("Feeding");
   }
 
   /**
-   * Meta-command to operate the shooter. The Flywheel starts spinning up and when
-   * it reaches the
+   * Meta-command to operate the shooter. The Flywheel starts spinning up and when it reaches the
    * desired speed it starts the Feeder.
    */
   public Command runShooterCommand() {
     Command spinUntilUp =
-        this.startEnd(
-                () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm),
-                () -> {
-                })
+        this.startEnd(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm), () -> {})
             .until(isFlywheelSpinning)
             .withName("SpinUntilUp");
 
@@ -175,23 +175,22 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command runShooter() {
-    return this.runOnce(
-      () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm)
-      )
-      .until(isFlywheelSpinning)
-      .andThen(
-        this.runOnce(() -> {
-          this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-          this.setFeederPower(FeederSetpoints.kFeed);
-        })
-      );
+    return this.runOnce(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm))
+        .until(isFlywheelSpinning)
+        .andThen(
+            this.runOnce(
+                () -> {
+                  this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+                  this.setFeederPower(FeederSetpoints.kFeed);
+                }));
   }
 
   public Command stopShooter() {
-    return new InstantCommand(() -> {
-      flywheelMotor.stopMotor();
-      feederMotor.stopMotor();
-    });
+    return new InstantCommand(
+        () -> {
+          flywheelMotor.stopMotor();
+          feederMotor.stopMotor();
+        });
   }
 
   @Override

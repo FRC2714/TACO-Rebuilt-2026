@@ -5,18 +5,16 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ShooterConstants.FeederSetpoints;
-import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 public class Superstructure extends SubsystemBase {
   private DriveSubsystem m_driveSubsystem;
   private Intake m_intake;
   private Shooter m_shooter;
-  
+
   public Superstructure(DriveSubsystem driveSubsystem, Intake intake, Shooter shooter) {
     m_driveSubsystem = driveSubsystem;
     m_intake = intake;
