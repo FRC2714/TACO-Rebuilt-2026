@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkSim;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
@@ -89,11 +90,11 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return this.run(
-        () -> {
-          //  setPivot(PivotSetpoints.INTAKE);
-          setRollerSpeed(RollerSetpoints.INTAKE);
-        });
+    return this.startEnd(
+            () -> //  setPivot(PivotSetpoints.INTAKE);
+            setRollerSpeed(RollerSetpoints.INTAKE),
+            () -> m_roller.stopMotor())
+        .withName("Intaking");
   }
 
   public Command extakeCommand() {
@@ -119,5 +120,9 @@ public class Intake extends SubsystemBase {
     rollerSim.setVelocity(appliedOutput * 5000); // fake RPM model
     rollerSim.setBusVoltage(12.0);
     rollerSim.setMotorCurrent(Math.abs(appliedOutput) * 40);
+
+    SmartDashboard.putNumber("Simulated Roller Velocity: ", rollerSim.getVelocity());
+    SmartDashboard.putNumber("Simulated Roller Current: ", rollerSim.getMotorCurrent());
+    SmartDashboard.putNumber("Simulated Bus Voltage: ", rollerSim.getBusVoltage());
   }
 }
