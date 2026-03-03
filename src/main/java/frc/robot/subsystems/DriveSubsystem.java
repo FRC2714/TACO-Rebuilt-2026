@@ -56,6 +56,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field2d = new Field2d();
 
+  private double m_driverHeadingOffsetDeg = 0.0;
+
   // Pose estimator with vision fusion
   SwerveDrivePoseEstimator m_poseEstimator =
       new SwerveDrivePoseEstimator(
@@ -148,11 +150,16 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
+    double driverRelativeHeading = getHeadingDegrees() - m_driverHeadingOffsetDeg;
+
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xSpeedDelivered, ySpeedDelivered, rotDelivered, getHeading())
+                    xSpeedDelivered,
+                    ySpeedDelivered,
+                    rotDelivered,
+                    Rotation2d.fromDegrees(driverRelativeHeading))
                 : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -192,9 +199,9 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.resetEncoders();
   }
 
-  /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    m_gyro.reset();
+  /** Sets the current heading as the driver's forward direction. */
+  public void zeroDriverHeading() {
+    m_driverHeadingOffsetDeg = getHeadingDegrees();
   }
 
   /** Resets pose to origin and re-seeds Limelight IMU. */

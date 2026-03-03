@@ -75,7 +75,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     m_driverController
         .start()
-        .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive))
+        .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive))
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
     m_driverController
