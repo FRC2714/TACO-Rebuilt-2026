@@ -53,7 +53,7 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 10;
     public static final int kRearRightTurningCanId = 8;
 
-    public static final boolean kGyroReversed = true;
+    public static final boolean kGyroReversed = false;
   }
 
   public static final class ModuleConstants {
@@ -76,7 +76,7 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final double kDriveDeadband = 0.1;
+    public static final double kDriveDeadband = 0.05;
   }
 
   public static final class AutoConstants {
@@ -97,11 +97,10 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 6780;
-    public static final double kVortexKv = 565; // rpm/V
   }
 
   public static final class Intake {
-    public static final int kRollerCanId = 4; // change later
+    public static final int kRollerCanId = 20; // change later
     public static final int kPivotCanId = 21;
 
     public static final double kPivotReduction = 1;
@@ -109,8 +108,8 @@ public final class Constants {
     public static final double kP = 0.06;
 
     public static final class RollerSetpoints {
-      public static final double kIntake = -0.6;
-      public static final double kExtake = 0.4;
+      public static final double kIntake = 0.6;
+      public static final double kExtake = -0.4;
       public static final double kStop = 0;
     }
 
@@ -119,21 +118,6 @@ public final class Constants {
       public static final double kStow = 15.2;
       public static final double kIntake = 69;
       public static final double kExtake = 90;
-    }
-  }
-
-  public static final class ShooterConstants {
-    public static final int kFeederMotorCanId = 5;
-    public static final int kFlywheelMotorCanId = 6;
-    public static final int kFlywheelFollowerMotorCanId = 7;
-
-    public static final class FeederSetpoints {
-      public static final double kFeed = 0.95;
-    }
-
-    public static final class FlywheelSetpoints {
-      public static final double kShootRpm = 2500;
-      public static final double kVelocityTolerance = 100;
     }
   }
 }

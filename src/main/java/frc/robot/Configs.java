@@ -7,7 +7,6 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import frc.robot.Constants.ModuleConstants;
 
 public final class Configs {
-
   public static final class MAXSwerveModule {
     public static final SparkFlexConfig drivingConfig = new SparkFlexConfig();
     public static final SparkFlexConfig turningConfig = new SparkFlexConfig();
@@ -97,59 +96,6 @@ public final class Configs {
           .idleMode(IdleMode.kCoast)
           .smartCurrentLimit(40)
           .voltageCompensation(12);
-    }
-  }
-
-  public static final class Shooter {
-    public static final SparkFlexConfig flywheelConfig = new SparkFlexConfig();
-    public static final SparkFlexConfig flywheelFollowerConfig = new SparkFlexConfig();
-    public static final SparkFlexConfig feederConfig = new SparkFlexConfig();
-
-    static {
-      // Configure basic setting of the flywheel motors
-      flywheelConfig
-          .inverted(true)
-          .idleMode(IdleMode.kCoast)
-          .closedLoopRampRate(1.0)
-          .openLoopRampRate(1.0)
-          .smartCurrentLimit(80);
-
-      /*
-       * Configure the closed loop controller. We want to make sure we set the
-       * feedback sensor as the primary encoder.
-       */
-      flywheelConfig
-          .closedLoop
-          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          // Set PID values for position control
-          .p(0.0002)
-          .outputRange(-1, 1);
-
-      //   flywheelConfig
-      //       .closedLoop
-      //       .maxMotion
-      //       // Set MAXMotion parameters for MAXMotion Velocity control
-      //       .cruiseVelocity(2000)
-      //       .maxAcceleration(4000)
-      //       .allowedProfileError(1);
-
-      // Constants.NeoMotorConstants.kVortexKv is in rpm/V. feedforward.kV is in V/rpm sort we take
-      // the reciprocol.
-      flywheelConfig.closedLoop.feedForward.kV(.0018);
-
-      //   flywheelConfig.encoder.velocityConversionFactor(34./46.);
-
-      // Configure the follower flywheel motor to follow the main flywheel motor
-      flywheelFollowerConfig
-          .apply(flywheelConfig)
-          .follow(Constants.ShooterConstants.kFlywheelMotorCanId, true);
-
-      // Configure basic setting of the feeder motor
-      feederConfig
-          .inverted(true)
-          .idleMode(IdleMode.kCoast)
-          .openLoopRampRate(1.0)
-          .smartCurrentLimit(60);
     }
   }
 }
