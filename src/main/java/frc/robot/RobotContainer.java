@@ -78,6 +78,10 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive))
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
+    m_driverController
+        .back()
+        .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
+
     // m_driverController.a().whileTrue(m_intake.extakeCommand());
     m_driverController.x().onTrue(m_intake.stowCommand());
     m_driverController.leftTrigger().whileTrue(m_intake.intakeCommand());

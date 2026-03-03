@@ -197,6 +197,24 @@ public class DriveSubsystem extends SubsystemBase {
     m_gyro.reset();
   }
 
+  /** Resets pose to origin and re-seeds Limelight IMU. */
+  public void zeroPose() {
+    Pose2d pose = new Pose2d();
+    m_gyro.reset();
+    m_poseEstimator.resetPosition(
+        pose.getRotation(),
+        new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+        },
+        pose);
+
+    LimelightHelpers.SetRobotOrientation(LimelightConstants.kFrontName, 0, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 1);
+  }
+
   /**
    * Returns the heading of the robot.
    *
