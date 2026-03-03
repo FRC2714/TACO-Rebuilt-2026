@@ -7,17 +7,21 @@ package frc.robot.subsystems;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.LimelightConstants;
+import frc.robot.utils.LimelightHelpers;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -48,9 +52,9 @@ public class DriveSubsystem extends SubsystemBase {
   // The gyro sensor
   private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
-  // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(
+  // Pose estimator with vision fusion
+  SwerveDrivePoseEstimator m_poseEstimator =
+      new SwerveDrivePoseEstimator(
           DriveConstants.kDriveKinematics,
           getHeading(),
           new SwerveModulePosition[] {
@@ -58,7 +62,10 @@ public class DriveSubsystem extends SubsystemBase {
             m_frontRight.getPosition(),
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
-          });
+          },
+          new Pose2d(),
+          LimelightConstants.m_stateStdDevs,
+          LimelightConstants.m_visionStdDevs);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -68,8 +75,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update the odometry in the periodic block
-    m_odometry.update(
+    m_poseEstimator.update(
         getHeading(),
         new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
@@ -77,6 +83,22 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
         });
+
+    LimelightHelpers.SetRobotOrientation(
+        LimelightConstants.kFrontName, getHeadingDegrees(), 0, 0, 0, 0, 0);
+    LimelightHelpers.Flush();
+
+    double omegaRps = Units.degreesToRotations(getTurnRate());
+
+    var frontMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontName);
+
+    if (Math.abs(omegaRps) < 1 && frontMeasurement != null && frontMeasurement.tagCount > 0) {
+      double xyStdDev = 0.7 * (1 + frontMeasurement.avgTagDist * 0.5);
+      m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
+      m_poseEstimator.addVisionMeasurement(
+          frontMeasurement.pose, frontMeasurement.timestampSeconds);
+    }
   }
 
   /**
@@ -85,7 +107,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_poseEstimator.getEstimatedPosition();
   }
 
   /**
@@ -94,7 +116,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(
+    m_poseEstimator.resetPosition(
         getHeading(),
         new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
@@ -176,6 +198,10 @@ public class DriveSubsystem extends SubsystemBase {
   public Rotation2d getHeading() {
     return Rotation2d.fromDegrees(
         m_gyro.getAngle(IMUAxis.kY) * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
+  }
+
+  public double getHeadingDegrees() {
+    return m_gyro.getAngle(IMUAxis.kY) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
   /**

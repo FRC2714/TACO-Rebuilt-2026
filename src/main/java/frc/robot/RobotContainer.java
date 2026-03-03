@@ -26,7 +26,7 @@ import frc.robot.subsystems.Superstructure;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   // private final SendableChooser<Command> autoChooser;
 
