@@ -47,6 +47,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The gyro sensor
   private final Canandgyro m_gyro = new Canandgyro(0);
+  private double m_headingOffsetRotations = 0;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry =
@@ -168,7 +169,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.setYaw(0);
+    m_headingOffsetRotations = m_gyro.getRoll();
   }
 
   /**
@@ -177,7 +178,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Units.rotationsToDegrees(m_gyro.getYaw());
+    return Units.rotationsToDegrees(m_gyro.getRoll() - m_headingOffsetRotations);
   }
 
   /**
@@ -186,6 +187,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return (m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
+    return (m_gyro.getAngularVelocityRoll() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
   }
 }
