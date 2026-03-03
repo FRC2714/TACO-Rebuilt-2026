@@ -18,6 +18,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
@@ -52,6 +54,8 @@ public class DriveSubsystem extends SubsystemBase {
   // The gyro sensor
   private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
+  private final Field2d m_field2d = new Field2d();
+
   // Pose estimator with vision fusion
   SwerveDrivePoseEstimator m_poseEstimator =
       new SwerveDrivePoseEstimator(
@@ -71,6 +75,7 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+    SmartDashboard.putData("Field", m_field2d);
   }
 
   @Override
@@ -99,6 +104,8 @@ public class DriveSubsystem extends SubsystemBase {
       m_poseEstimator.addVisionMeasurement(
           frontMeasurement.pose, frontMeasurement.timestampSeconds);
     }
+
+    m_field2d.setRobotPose(getPose());
   }
 
   /**
