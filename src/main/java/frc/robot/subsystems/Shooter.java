@@ -12,6 +12,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Configs;
@@ -21,7 +22,8 @@ import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 
 public class Shooter extends SubsystemBase {
 
-  // Initialize flywheel SPARKs. We will use MAXMotion velocity control for the flywheel, so we also
+  // Initialize flywheel SPARKs. We will use MAXMotion velocity control for the
+  // flywheel, so we also
   // need to
   // initialize the closed loop controllers and encoders.
   private SparkFlex flywheelMotor =
@@ -38,7 +40,8 @@ public class Shooter extends SubsystemBase {
   SparkFlexSim flywheelFollowerSim =
       new SparkFlexSim(flywheelFollowerMotor, flywheelFollowerGearbox);
 
-  // Initialize feeder SPARK. We will use open loop control for this so we don't need a closed loop
+  // Initialize feeder SPARK. We will use open loop control for this so we don't
+  // need a closed loop
   // controller like above.
   private SparkFlex feederMotor =
       new SparkFlex(ShooterConstants.kFeederMotorCanId, MotorType.kBrushless);
@@ -151,21 +154,43 @@ public class Shooter extends SubsystemBase {
    * desired speed it starts the Feeder.
    */
   public Command runShooterCommand() {
-    return this.startEnd(
-            () -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm),
-            () -> flywheelMotor.stopMotor())
-        .until(isFlywheelSpinning)
-        .andThen(
-            this.startEnd(
+    Command spinUntilUp =
+        this.startEnd(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm), () -> {})
+            .until(isFlywheelSpinning)
+            .withName("SpinUntilUp");
+
+    Command feederPhase =
+        this.startEnd(
                 () -> {
                   this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
                   this.setFeederPower(FeederSetpoints.kFeed);
                 },
                 () -> {
-                  flywheelMotor.stopMotor();
-                  feederMotor.stopMotor();
-                }))
-        .withName("Shooting");
+                  this.setFlywheelVelocity(0.0);
+                  this.setFeederPower(0.0);
+                })
+            .withName("FeederPhase");
+
+    return spinUntilUp.andThen(feederPhase).withName("Shooting");
+  }
+
+  public Command runShooter() {
+    return this.runOnce(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm))
+        .until(isFlywheelSpinning)
+        .andThen(
+            this.runOnce(
+                () -> {
+                  this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+                  this.setFeederPower(FeederSetpoints.kFeed);
+                }));
+  }
+
+  public Command stopShooter() {
+    return new InstantCommand(
+        () -> {
+          flywheelMotor.stopMotor();
+          feederMotor.stopMotor();
+        });
   }
 
   @Override
@@ -191,7 +216,8 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    // Simulate flywheel behavior using SparkFlexSim APIs (setVelocity / setMotorCurrent)
+    // Simulate flywheel behavior using SparkFlexSim APIs (setVelocity /
+    // setMotorCurrent)
     double flywheelApplied = flywheelMotor.getAppliedOutput();
     // crude mapping: applied output -> RPM/current
     flywheelSim.setVelocity(flywheelApplied * 6000.0);

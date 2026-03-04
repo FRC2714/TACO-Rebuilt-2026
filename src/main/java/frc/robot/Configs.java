@@ -8,8 +8,6 @@ import frc.robot.Constants.ModuleConstants;
 
 public final class Configs {
 
-  private static final double nominalVoltage = 12.0;
-
   public static final class MAXSwerveModule {
     public static final SparkFlexConfig drivingConfig = new SparkFlexConfig();
     public static final SparkFlexConfig turningConfig = new SparkFlexConfig();

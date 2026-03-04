@@ -4,8 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
@@ -122,6 +126,12 @@ public final class Constants {
     }
   }
 
+  public static final class LimelightConstants {
+    public static final String kFrontName = "limelight-front";
+    public static final Matrix<N3, N1> m_stateStdDevs = VecBuilder.fill(0.15, 0.15, 0.00001);
+    public static final Matrix<N3, N1> m_visionStdDevs = VecBuilder.fill(0.7, 0.7, 999999);
+  }
+
   public static final class ShooterConstants {
     public static final int kFeederMotorCanId = 5;
     public static final int kFlywheelMotorCanId = 6;
@@ -132,7 +142,7 @@ public final class Constants {
     }
 
     public static final class FlywheelSetpoints {
-      public static final double kShootRpm = 3900;
+      public static final double kShootRpm = 2500;
       public static final double kVelocityTolerance = 100;
     }
   }
