@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -16,8 +17,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
-import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -52,7 +51,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+  private final Canandgyro m_gyro = new Canandgyro(0);
 
   private final Field2d m_field2d = new Field2d();
 
@@ -207,7 +206,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Resets pose to origin and re-seeds Limelight IMU. */
   public void zeroPose() {
     Pose2d pose = new Pose2d();
-    m_gyro.reset();
+    m_gyro.setYaw(0);
     m_poseEstimator.resetPosition(
         pose.getRotation(),
         new SwerveModulePosition[] {
@@ -225,15 +224,19 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading in degrees, from -180 to 180
+   * @return the robot's heading as a Rotation2d
    */
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(
-        m_gyro.getAngle(IMUAxis.kY) * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
+    return Rotation2d.fromDegrees(getHeadingDegrees());
   }
 
+  /**
+   * Returns the heading of the robot in degrees.
+   *
+   * @return the robot's heading in degrees
+   */
   public double getHeadingDegrees() {
-    return m_gyro.getAngle(IMUAxis.kY) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return Units.rotationsToDegrees(m_gyro.getYaw());
   }
 
   /**
@@ -242,6 +245,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate(IMUAxis.kY) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return (m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
   }
 }
