@@ -236,7 +236,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees
    */
   public double getHeadingDegrees() {
-    return Units.rotationsToDegrees(m_gyro.getYaw()) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return Units.rotationsToDegrees(m_gyro.getYaw());
   }
 
   /**
