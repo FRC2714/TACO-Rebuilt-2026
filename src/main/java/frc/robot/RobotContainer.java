@@ -26,7 +26,7 @@ import frc.robot.subsystems.Superstructure;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   // private final SendableChooser<Command> autoChooser;
 
@@ -75,8 +75,12 @@ public class RobotContainer {
   private void configureButtonBindings() {
     m_driverController
         .start()
-        .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive))
+        .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive))
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+
+    m_driverController
+        .back()
+        .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
 
     // m_driverController.a().whileTrue(m_intake.extakeCommand());
     m_driverController.x().onTrue(m_intake.stowCommand());
