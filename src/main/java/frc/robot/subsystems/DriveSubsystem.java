@@ -88,6 +88,9 @@ public class DriveSubsystem extends SubsystemBase {
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     SmartDashboard.putData("Field", m_field2d);
 
+    LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 1);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 1);
+
     RobotConfig config =
         new RobotConfig(
             30,
