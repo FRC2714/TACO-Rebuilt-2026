@@ -144,6 +144,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     LimelightHelpers.SetRobotOrientation(
         LimelightConstants.kFrontName, getHeadingDegrees(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation(
+        LimelightConstants.kBackName, getHeadingDegrees(), 0, 0, 0, 0, 0);
     LimelightHelpers.Flush();
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
@@ -156,6 +158,15 @@ public class DriveSubsystem extends SubsystemBase {
       m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
       m_poseEstimator.addVisionMeasurement(
           frontMeasurement.pose, frontMeasurement.timestampSeconds);
+    }
+
+    var backMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kBackName);
+
+    if (Math.abs(omegaRps) < 1 && backMeasurement != null && backMeasurement.tagCount > 0) {
+      double xyStdDev = 0.7 * (1 + backMeasurement.avgTagDist * 0.5);
+      m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
+      m_poseEstimator.addVisionMeasurement(backMeasurement.pose, backMeasurement.timestampSeconds);
     }
 
     m_field2d.setRobotPose(getPose());
@@ -271,6 +282,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     LimelightHelpers.SetRobotOrientation(LimelightConstants.kFrontName, 0, 0, 0, 0, 0, 0);
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 1);
+    LimelightHelpers.SetRobotOrientation(LimelightConstants.kBackName, 0, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 1);
   }
 
   /**
