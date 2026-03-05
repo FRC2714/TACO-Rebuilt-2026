@@ -109,6 +109,7 @@ public final class Constants {
     public static final int kPivotCanId = 21;
 
     public static final double kPivotReduction = 1;
+    public static final double kPivotThreshold = 2.0;
 
     public static final double kP = 0.06;
 

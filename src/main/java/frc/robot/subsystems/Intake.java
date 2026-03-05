@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkSim;
@@ -11,22 +14,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
-import frc.robot.Constants.Intake.PivotSetpoints;
-import frc.robot.Constants.Intake.RollerSetpoints;
 
 public class Intake extends SubsystemBase {
-  //   private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId,
-  // MotorType.kBrushless);
+  private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId, MotorType.kBrushless);
 
-  //   private AbsoluteEncoder m_pivotEncoder = m_pivot.getAbsoluteEncoder();
+  private AbsoluteEncoder m_pivotEncoder = m_pivot.getAbsoluteEncoder();
 
-  //   private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
+  private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
 
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
 
   private SparkSim rollerSim;
-  private SparkFlex motor;
-  private SparkSim motorSim;
+
+  private double pivotSetpoint = Constants.Intake.PivotSetpoints.kStow;
 
   private enum PivotSetpoints {
     STOW,
@@ -42,9 +42,8 @@ public class Intake extends SubsystemBase {
 
   public Intake() {
     // Constructor code here
-    // m_pivot.configure(
-    //     Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters,
-    // PersistMode.kPersistParameters);
+    m_pivot.configure(
+        Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_roller.configure(
         Configs.Intake.rollerConfig,
         ResetMode.kResetSafeParameters,
@@ -86,13 +85,16 @@ public class Intake extends SubsystemBase {
       default:
         return;
     }
-    // m_pivotController.setSetpoint(targetPosition, ControlType.kPosition);
+    pivotSetpoint = targetPosition;
+    m_pivotController.setReference(targetPosition, ControlType.kPosition);
   }
 
   public Command intakeCommand() {
     return this.startEnd(
-            () -> //  setPivot(PivotSetpoints.INTAKE);
-            setRollerSpeed(RollerSetpoints.INTAKE),
+            () -> {
+              setPivot(PivotSetpoints.INTAKE);
+              setRollerSpeed(RollerSetpoints.INTAKE);
+            },
             () -> m_roller.stopMotor())
         .withName("Intaking");
   }
@@ -101,7 +103,7 @@ public class Intake extends SubsystemBase {
     return this.run(
         () -> {
           setRollerSpeed(RollerSetpoints.EXTAKE);
-          //  setPivot(PivotSetpoints.EXTAKE);
+          setPivot(PivotSetpoints.EXTAKE);
         });
   }
 
@@ -109,8 +111,20 @@ public class Intake extends SubsystemBase {
     return this.run(
         () -> {
           setRollerSpeed(RollerSetpoints.STOP);
-          //  setPivot(PivotSetpoints.STOW);
+          setPivot(PivotSetpoints.STOW);
         });
+  }
+
+  public boolean atSetpoint() {
+    return Math.abs(m_pivotEncoder.getPosition() - pivotSetpoint)
+        <= Constants.Intake.kPivotThreshold;
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("Intake/Pivot/Position", m_pivotEncoder.getPosition());
+    SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
+    SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
   }
 
   public void simulationPeriodic() {
