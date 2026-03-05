@@ -97,6 +97,13 @@ public class Intake extends SubsystemBase {
         .withName("Intaking");
   }
 
+  public Command slowIntakeCommand() {
+    return this.startEnd(
+            () -> m_roller.set(Constants.Intake.RollerSetpoints.kIntake * 0.5),
+            () -> m_roller.stopMotor())
+        .withName("SlowIntaking");
+  }
+
   public Command extakeCommand() {
     return this.run(
         () -> {
