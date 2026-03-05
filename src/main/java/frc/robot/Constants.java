@@ -132,6 +132,13 @@ public final class Constants {
     public static final Matrix<N3, N1> m_visionStdDevs = VecBuilder.fill(0.7, 0.7, 999999);
   }
 
+  public static final class AutoAlignConstants {
+    public static final double kP = 0.1;
+    public static final double kI = 0;
+    public static final double kD = 0.005;
+    public static final double kAlignTolerance = 2.0; // degrees of tx error
+  }
+
   public static final class ShooterConstants {
     public static final int kFeederMotorCanId = 5;
     public static final int kFlywheelMotorCanId = 6;

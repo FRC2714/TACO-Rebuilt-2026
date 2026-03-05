@@ -23,10 +23,15 @@ public class Superstructure extends SubsystemBase {
 
   public Command shooterSequence() {
     return new ParallelCommandGroup(
-        m_shooter.runShooterCommand(),
-        new SequentialCommandGroup(
-            new WaitUntilCommand(() -> m_shooter.isFlywheelSpinning.getAsBoolean()),
-            m_intake.intakeCommand()));
+            m_shooter.runShooterCommand(),
+            new SequentialCommandGroup(
+                new WaitUntilCommand(
+                    () ->
+                        m_shooter.isFlywheelSpinning.getAsBoolean()
+                            && m_driveSubsystem.isAligned()),
+                m_intake.intakeCommand()))
+        .beforeStarting(() -> m_driveSubsystem.setAligning(true))
+        .finallyDo(() -> m_driveSubsystem.setAligning(false));
   }
 
   @Override

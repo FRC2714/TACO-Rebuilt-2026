@@ -14,6 +14,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.AutoAlignConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
@@ -66,6 +68,10 @@ public class DriveSubsystem extends SubsystemBase {
   private final Field2d m_field2d = new Field2d();
 
   private double m_driverHeadingOffsetDeg = 0.0;
+
+  private boolean aligning = false;
+  private final PIDController alignPID =
+      new PIDController(AutoAlignConstants.kP, AutoAlignConstants.kI, AutoAlignConstants.kD);
 
   // Pose estimator with vision fusion
   SwerveDrivePoseEstimator m_poseEstimator =
@@ -159,6 +165,12 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     m_field2d.setRobotPose(getPose());
+
+    SmartDashboard.putBoolean("AutoAlign/Aligning", aligning);
+    SmartDashboard.putBoolean("AutoAlign/Aligned", isAligned());
+    SmartDashboard.putNumber("AutoAlign/TX", LimelightHelpers.getTX(LimelightConstants.kFrontName));
+    SmartDashboard.putBoolean(
+        "AutoAlign/HasTarget", LimelightHelpers.getTV(LimelightConstants.kFrontName));
   }
 
   /**
@@ -203,6 +215,13 @@ public class DriveSubsystem extends SubsystemBase {
 
     double driverRelativeHeading = getHeadingDegrees() - m_driverHeadingOffsetDeg;
 
+    if (aligning && LimelightHelpers.getTV(LimelightConstants.kFrontName)) {
+      double tx = LimelightHelpers.getTX(LimelightConstants.kFrontName);
+      rotDelivered = alignPID.calculate(tx, 0);
+      xSpeedDelivered /= 3;
+      ySpeedDelivered /= 3;
+    }
+
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
@@ -240,6 +259,19 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
+  }
+
+  public void setAligning(boolean aligning) {
+    this.aligning = aligning;
+    if (!aligning) {
+      alignPID.reset();
+    }
+  }
+
+  public boolean isAligned() {
+    if (!LimelightHelpers.getTV(LimelightConstants.kFrontName)) return true;
+    double tx = LimelightHelpers.getTX(LimelightConstants.kFrontName);
+    return Math.abs(tx) <= AutoAlignConstants.kAlignTolerance;
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
