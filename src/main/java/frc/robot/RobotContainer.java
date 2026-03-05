@@ -91,6 +91,7 @@ public class RobotContainer {
     m_driverController.x().onTrue(m_intake.stowCommand());
     m_driverController.leftTrigger().whileTrue(m_intake.intakeCommand());
     m_driverController.rightTrigger().whileTrue(m_superstructure.shooterSequence());
+    m_driverController.povDown().whileTrue(m_intake.extakeCommand());
   }
 
   /**

@@ -1,10 +1,7 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkSim;
@@ -16,15 +13,17 @@ import frc.robot.Configs;
 import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
-  private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId, MotorType.kBrushless);
+  // private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId, MotorType.kBrushless);
 
-  private AbsoluteEncoder m_pivotEncoder = m_pivot.getAbsoluteEncoder();
+  // private AbsoluteEncoder m_pivotEncoder = m_pivot.getAbsoluteEncoder();
 
-  private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
+  // private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
 
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
+  private SparkFlex m_conveyor = new SparkFlex(Constants.Intake.kConveyorCanId, MotorType.kBrushless);
 
   private SparkSim rollerSim;
+  private SparkSim conveyorSim;
 
   private double pivotSetpoint = Constants.Intake.PivotSetpoints.kStow;
 
@@ -42,10 +41,15 @@ public class Intake extends SubsystemBase {
 
   public Intake() {
     // Constructor code here
-    m_pivot.configure(
-        Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // m_pivot.configure(
+    //     Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters,
+    // PersistMode.kPersistParameters);
     m_roller.configure(
         Configs.Intake.rollerConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
+    m_conveyor.configure(
+        Configs.Intake.conveyorConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     DCMotor motorModel = DCMotor.getNEO(1);
@@ -68,6 +72,7 @@ public class Intake extends SubsystemBase {
         return;
     }
     m_roller.set(speed);
+    m_conveyor.set(speed);
   }
 
   private void setPivot(PivotSetpoints setpoint) {
@@ -86,7 +91,7 @@ public class Intake extends SubsystemBase {
         return;
     }
     pivotSetpoint = targetPosition;
-    m_pivotController.setReference(targetPosition, ControlType.kPosition);
+    // m_pivotController.setReference(targetPosition, ControlType.kPosition);
   }
 
   public Command intakeCommand() {
@@ -95,7 +100,7 @@ public class Intake extends SubsystemBase {
               setPivot(PivotSetpoints.INTAKE);
               setRollerSpeed(RollerSetpoints.INTAKE);
             },
-            () -> m_roller.stopMotor())
+            () -> { m_roller.stopMotor(); m_conveyor.stopMotor();})
         .withName("Intaking");
   }
 
@@ -115,25 +120,30 @@ public class Intake extends SubsystemBase {
         });
   }
 
-  public boolean atSetpoint() {
-    return Math.abs(m_pivotEncoder.getPosition() - pivotSetpoint)
-        <= Constants.Intake.kPivotThreshold;
-  }
+  // public boolean atSetpoint() {
+  //   return Math.abs(m_pivotEncoder.getPosition() - pivotSetpoint)
+  //       <= Constants.Intake.kPivotThreshold;
+  // }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Intake/Pivot/Position", m_pivotEncoder.getPosition());
+    // SmartDashboard.putNumber("Intake/Pivot/Position", m_pivotEncoder.getPosition());
     SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
-    SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
+    // SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
   }
 
   public void simulationPeriodic() {
     // Example: simulate velocity based on applied output
-    double appliedOutput = m_roller.getAppliedOutput();
+    double rollerAppliedOutput = m_roller.getAppliedOutput();
+    double conveyorAppliedOutput = m_conveyor.getAppliedOutput();
 
-    rollerSim.setVelocity(appliedOutput * 5000); // fake RPM model
+    rollerSim.setVelocity(rollerAppliedOutput * 5000); // fake RPM model
     rollerSim.setBusVoltage(12.0);
-    rollerSim.setMotorCurrent(Math.abs(appliedOutput) * 40);
+    rollerSim.setMotorCurrent(Math.abs(rollerAppliedOutput) * 40);
+
+    conveyorSim.setVelocity(rollerAppliedOutput * 5000); // fake RPM model
+    conveyorSim.setBusVoltage(12.0);
+    conveyorSim.setMotorCurrent(Math.abs(rollerAppliedOutput) * 40);
 
     SmartDashboard.putNumber("Simulated Roller Velocity: ", rollerSim.getVelocity());
     SmartDashboard.putNumber("Simulated Roller Current: ", rollerSim.getMotorCurrent());
