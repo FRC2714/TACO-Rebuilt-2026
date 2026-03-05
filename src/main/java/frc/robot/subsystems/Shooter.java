@@ -155,14 +155,7 @@ public class Shooter extends SubsystemBase {
    */
   public Command runShooterCommand() {
     Command spinUntilUp =
-        this.startEnd(
-                () -> {
-                  this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
-                  this.setFeederPower(-FeederSetpoints.kFeed);
-                },
-                () -> {
-                  this.setFeederPower(0.0);
-                })
+        this.startEnd(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm), () -> {})
             .until(isFlywheelSpinning)
             .withName("SpinUntilUp");
 
