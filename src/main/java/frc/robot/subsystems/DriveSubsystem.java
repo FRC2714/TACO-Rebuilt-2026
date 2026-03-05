@@ -4,6 +4,11 @@
 
 package frc.robot.subsystems;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -12,16 +17,21 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.Constants.ModuleConstants;
 import frc.robot.utils.LimelightHelpers;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -77,6 +87,48 @@ public class DriveSubsystem extends SubsystemBase {
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     SmartDashboard.putData("Field", m_field2d);
+
+    RobotConfig config =
+        new RobotConfig(
+            30,
+            6.0,
+            new ModuleConfig(
+                ModuleConstants.kWheelDiameterMeters / 2,
+                DriveConstants.kMaxSpeedMetersPerSecond,
+                1.2,
+                DCMotor.getNeoVortex(1).withReduction(ModuleConstants.kDrivingMotorReduction),
+                60,
+                1),
+            new Translation2d(DriveConstants.kWheelBase / 2, DriveConstants.kTrackWidth / 2),
+            new Translation2d(DriveConstants.kWheelBase / 2, -DriveConstants.kTrackWidth / 2),
+            new Translation2d(-DriveConstants.kWheelBase / 2, DriveConstants.kTrackWidth / 2),
+            new Translation2d(-DriveConstants.kWheelBase / 2, -DriveConstants.kTrackWidth / 2));
+
+    AutoBuilder.configure(
+        this::getPose,
+        this::resetOdometry,
+        () ->
+            DriveConstants.kDriveKinematics.toChassisSpeeds(
+                m_frontLeft.getState(),
+                m_frontRight.getState(),
+                m_rearLeft.getState(),
+                m_rearRight.getState()),
+        (speeds, feedforwards) -> {
+          var states = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
+          setModuleStates(states);
+        },
+        new PPHolonomicDriveController(
+            new PIDConstants(AutoConstants.kPXController, 0, 0),
+            new PIDConstants(AutoConstants.kPThetaController, 0, 0)),
+        config,
+        () -> {
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        this);
   }
 
   @Override
