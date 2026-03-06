@@ -26,7 +26,7 @@ public class Superstructure extends SubsystemBase {
         m_shooter.runShooterCommand(),
         new SequentialCommandGroup(
             new WaitUntilCommand(() -> m_shooter.isFlywheelSpinning.getAsBoolean()),
-            m_intake.intakeCommand()));
+            m_intake.conveyorCommand()));
   }
 
   @Override
