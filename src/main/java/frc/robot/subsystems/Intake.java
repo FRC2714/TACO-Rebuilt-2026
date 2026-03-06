@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkSim;
@@ -13,11 +16,11 @@ import frc.robot.Configs;
 import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
-  // private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId, MotorType.kBrushless);
+  private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId, MotorType.kBrushless);
 
-  // private AbsoluteEncoder m_pivotEncoder = m_pivot.getAbsoluteEncoder();
+  private AbsoluteEncoder m_pivotEncoder = m_pivot.getAbsoluteEncoder();
 
-  // private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
+  private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
 
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
   private SparkFlex m_conveyor = new SparkFlex(Constants.Intake.kConveyorCanId, MotorType.kBrushless);
@@ -41,9 +44,9 @@ public class Intake extends SubsystemBase {
 
   public Intake() {
     // Constructor code here
-    // m_pivot.configure(
-    //     Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters,
-    // PersistMode.kPersistParameters);
+    m_pivot.configure(
+        Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters,
+    PersistMode.kPersistParameters);
     m_roller.configure(
         Configs.Intake.rollerConfig,
         ResetMode.kResetSafeParameters,
@@ -91,7 +94,7 @@ public class Intake extends SubsystemBase {
         return;
     }
     pivotSetpoint = targetPosition;
-    // m_pivotController.setReference(targetPosition, ControlType.kPosition);
+    m_pivotController.setSetpoint(targetPosition, ControlType.kPosition);
   }
 
   public Command intakeCommand() {

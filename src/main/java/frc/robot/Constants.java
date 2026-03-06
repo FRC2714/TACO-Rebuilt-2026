@@ -107,7 +107,7 @@ public final class Constants {
   public static final class Intake {
     public static final int kRollerCanId = 16; // change later
     public static final int kConveyorCanId = 4; // change later
-    public static final int kPivotCanId = 21;
+    public static final int kPivotCanId = 17;
 
     public static final double kPivotReduction = 1;
     public static final double kPivotThreshold = 2.0;
