@@ -58,12 +58,16 @@ public class Robot extends TimedRobot {
     double heading = m_robotContainer.m_robotDrive.getHeadingDegrees();
     LimelightHelpers.SetRobotOrientation(LimelightConstants.kFrontName, heading, 0, 0, 0, 0, 0);
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 1);
+
+    LimelightHelpers.SetRobotOrientation(LimelightConstants.kBackName, heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 1);
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 4);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 4);
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -79,6 +83,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 4);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 4);
 
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
