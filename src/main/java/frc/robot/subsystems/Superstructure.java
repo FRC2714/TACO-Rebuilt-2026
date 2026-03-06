@@ -31,7 +31,11 @@ public class Superstructure extends SubsystemBase {
                             && m_driveSubsystem.isAligned()),
                 m_intake.intakeCommand()))
         .beforeStarting(() -> m_driveSubsystem.setAligning(true))
-        .finallyDo(() -> m_driveSubsystem.setAligning(false));
+        .finallyDo(
+            () -> {
+              m_driveSubsystem.setAligning(false);
+              m_shooter.stopAll();
+            });
   }
 
   @Override
