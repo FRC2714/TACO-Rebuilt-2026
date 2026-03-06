@@ -114,7 +114,6 @@ public class Intake extends SubsystemBase {
         () -> {
           setPivot(PivotSetpoints.EXTAKE);
           setRollerSpeed(RollerSetpoints.EXTAKE);
-          setPivot(PivotSetpoints.EXTAKE);
         });
   }
 
