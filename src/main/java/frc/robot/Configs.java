@@ -98,7 +98,7 @@ public final class Configs {
           .idleMode(IdleMode.kCoast)
           .smartCurrentLimit(40)
           .voltageCompensation(12);
-        conveyorConfig
+      conveyorConfig
           .inverted(false)
           .idleMode(IdleMode.kCoast)
           .smartCurrentLimit(40)

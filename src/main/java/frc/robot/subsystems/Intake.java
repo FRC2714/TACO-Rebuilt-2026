@@ -1,9 +1,8 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -23,12 +22,13 @@ public class Intake extends SubsystemBase {
   private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
 
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
-  private SparkFlex m_conveyor = new SparkFlex(Constants.Intake.kConveyorCanId, MotorType.kBrushless);
+  private SparkFlex m_conveyor =
+      new SparkFlex(Constants.Intake.kConveyorCanId, MotorType.kBrushless);
 
   private SparkSim rollerSim;
   private SparkSim conveyorSim;
 
-  private double pivotSetpoint = Constants.Intake.PivotSetpoints.kStow;
+  private double pivotSpeed = Constants.Intake.PivotSetpoints.kStow;
 
   private enum PivotSetpoints {
     STOW,
@@ -45,8 +45,7 @@ public class Intake extends SubsystemBase {
   public Intake() {
     // Constructor code here
     m_pivot.configure(
-        Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters,
-    PersistMode.kPersistParameters);
+        Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_roller.configure(
         Configs.Intake.rollerConfig,
         ResetMode.kResetSafeParameters,
@@ -79,22 +78,22 @@ public class Intake extends SubsystemBase {
   }
 
   private void setPivot(PivotSetpoints setpoint) {
-    double targetPosition = 0;
+    double setSpeed = 0;
     switch (setpoint) {
       case STOW:
-        targetPosition = Constants.Intake.PivotSetpoints.kStow;
+        setSpeed = Constants.Intake.PivotSetpoints.kStow;
         break;
       case INTAKE:
-        targetPosition = Constants.Intake.PivotSetpoints.kIntake;
+        setSpeed = Constants.Intake.PivotSetpoints.kIntake;
         break;
       case EXTAKE:
-        targetPosition = Constants.Intake.PivotSetpoints.kExtake;
+        setSpeed = Constants.Intake.PivotSetpoints.kExtake;
         break;
       default:
         return;
     }
-    pivotSetpoint = targetPosition;
-    m_pivotController.setSetpoint(targetPosition, ControlType.kPosition);
+    pivotSpeed = setSpeed;
+    m_pivot.set(setSpeed);
   }
 
   public Command intakeCommand() {
@@ -103,13 +102,17 @@ public class Intake extends SubsystemBase {
               setPivot(PivotSetpoints.INTAKE);
               setRollerSpeed(RollerSetpoints.INTAKE);
             },
-            () -> { m_roller.stopMotor(); m_conveyor.stopMotor();})
+            () -> {
+              m_roller.stopMotor();
+              m_conveyor.stopMotor();
+            })
         .withName("Intaking");
   }
 
   public Command extakeCommand() {
     return this.run(
         () -> {
+          setPivot(PivotSetpoints.EXTAKE);
           setRollerSpeed(RollerSetpoints.EXTAKE);
           setPivot(PivotSetpoints.EXTAKE);
         });
@@ -131,7 +134,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // SmartDashboard.putNumber("Intake/Pivot/Position", m_pivotEncoder.getPosition());
-    SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
+    SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSpeed);
     // SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
   }
 

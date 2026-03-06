@@ -121,10 +121,10 @@ public final class Constants {
     }
 
     public static final class PivotSetpoints {
-      // Zero offset in Hardware Client is 10
-      public static final double kStow = 15.2;
-      public static final double kIntake = 69;
-      public static final double kExtake = 90;
+      // No encoder so use m_pivot.set(PivotSetpoints.WHATEVER)
+      public static final double kStow = -0.3;
+      public static final double kIntake = 0.3;
+      public static final double kExtake = 0.3;
     }
   }
 
