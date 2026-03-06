@@ -63,6 +63,7 @@ public final class Configs {
   public static final class Intake {
     public static final SparkFlexConfig rollerConfig = new SparkFlexConfig();
     public static final SparkFlexConfig pivotConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig conveyorConfig = new SparkFlexConfig();
 
     static {
       // Configure basic setting of the arm motor
@@ -93,6 +94,11 @@ public final class Configs {
 
       // Configure basic settings of the intake motor
       rollerConfig
+          .inverted(false)
+          .idleMode(IdleMode.kCoast)
+          .smartCurrentLimit(40)
+          .voltageCompensation(12);
+      conveyorConfig
           .inverted(false)
           .idleMode(IdleMode.kCoast)
           .smartCurrentLimit(40)

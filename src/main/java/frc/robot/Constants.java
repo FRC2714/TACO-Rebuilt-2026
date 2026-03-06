@@ -105,24 +105,26 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final int kRollerCanId = 4; // change later
-    public static final int kPivotCanId = 21;
+    public static final int kRollerCanId = 16; // change later
+    public static final int kConveyorCanId = 4; // change later
+    public static final int kPivotCanId = 17;
 
     public static final double kPivotReduction = 1;
+    public static final double kPivotThreshold = 2.0;
 
     public static final double kP = 0.06;
 
     public static final class RollerSetpoints {
-      public static final double kIntake = -0.6;
+      public static final double kIntake = -0.5;
       public static final double kExtake = 0.4;
       public static final double kStop = 0;
     }
 
     public static final class PivotSetpoints {
-      // Zero offset in Hardware Client is 10
-      public static final double kStow = 15.2;
-      public static final double kIntake = 69;
-      public static final double kExtake = 90;
+      // No encoder so use m_pivot.set(PivotSetpoints.WHATEVER)
+      public static final double kStow = -0.3;
+      public static final double kIntake = 0.3;
+      public static final double kExtake = 0.3;
     }
   }
 
