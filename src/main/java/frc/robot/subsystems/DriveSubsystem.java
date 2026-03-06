@@ -70,6 +70,8 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_driverHeadingOffsetDeg = 0.0;
 
   private boolean aligning = false;
+  private boolean shooting = false;
+  private double alignRotSpeed = 0.0;
   private final PIDController alignPID =
       new PIDController(AutoAlignConstants.kP, AutoAlignConstants.kI, AutoAlignConstants.kD);
 
@@ -166,6 +168,13 @@ public class DriveSubsystem extends SubsystemBase {
 
     m_field2d.setRobotPose(getPose());
 
+    if ((aligning || shooting) && LimelightHelpers.getTV(LimelightConstants.kFrontName)) {
+      double tx = LimelightHelpers.getTX(LimelightConstants.kFrontName);
+      alignRotSpeed = alignPID.calculate(tx, 0);
+    } else {
+      alignRotSpeed = 0.0;
+    }
+
     SmartDashboard.putBoolean("AutoAlign/Aligning", aligning);
     SmartDashboard.putBoolean("AutoAlign/Aligned", isAligned());
     SmartDashboard.putNumber("AutoAlign/TX", LimelightHelpers.getTX(LimelightConstants.kFrontName));
@@ -215,11 +224,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     double driverRelativeHeading = getHeadingDegrees() - m_driverHeadingOffsetDeg;
 
-    if (aligning && LimelightHelpers.getTV(LimelightConstants.kFrontName)) {
-      double tx = LimelightHelpers.getTX(LimelightConstants.kFrontName);
-      rotDelivered = alignPID.calculate(tx, 0);
-      xSpeedDelivered /= 3;
-      ySpeedDelivered /= 3;
+    if (aligning || shooting) {
+      rotDelivered = alignRotSpeed;
     }
 
     var swerveModuleStates =
@@ -264,6 +270,13 @@ public class DriveSubsystem extends SubsystemBase {
   public void setAligning(boolean aligning) {
     this.aligning = aligning;
     if (!aligning) {
+      alignPID.reset();
+    }
+  }
+
+  public void setShooting(boolean shooting) {
+    this.shooting = shooting;
+    if (!shooting) {
       alignPID.reset();
     }
   }
