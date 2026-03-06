@@ -128,6 +128,7 @@ public final class Constants {
 
   public static final class LimelightConstants {
     public static final String kFrontName = "limelight-front";
+    public static final String kBackName = "limelight-back";
     public static final Matrix<N3, N1> m_stateStdDevs = VecBuilder.fill(0.15, 0.15, 0.00001);
     public static final Matrix<N3, N1> m_visionStdDevs = VecBuilder.fill(0.7, 0.7, 999999);
   }
