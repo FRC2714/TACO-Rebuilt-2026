@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5862054208273886,
-        "y": 2.074793152639087
+        "x": 2.3908915662650605,
+        "y": 6.06755421686747
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7169080174958093,
-        "y": 2.098103904315161
+        "x": 3.348352336593163,
+        "y": 5.52413053641098
       },
       "isLocked": false,
-      "linkedName": "start-position"
+      "linkedName": "score-position"
     },
     {
       "anchor": {
-        "x": 2.266462196861626,
-        "y": 2.074793152639087
+        "x": 6.639728958630526,
+        "y": 5.503537803138374
       },
       "prevControl": {
-        "x": 3.1953684354891423,
-        "y": 2.0913494809468136
+        "x": 5.639728958630526,
+        "y": 5.503537803138374
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Shoot Position"
+      "linkedName": "start-intake-position"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 39.44005273669041
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Outpost",
+  "folder": "Depot Preload to NZ",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -50.792796495032114
   },
   "useDefaultConstraints": true
 }

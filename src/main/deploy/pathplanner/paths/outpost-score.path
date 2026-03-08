@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.36447931526390864,
-        "y": 0.418644793152639
+        "x": 0.6750071326676175,
+        "y": 0.6256633380884444
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.0238515474546062,
-        "y": 0.6792163320812977
+        "x": 1.3343793648583149,
+        "y": 0.8862348770171031
       },
       "isLocked": false,
       "linkedName": "outpost-Intake"
@@ -45,7 +45,7 @@
     "rotation": 39.44005273669041
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Outpost",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 178.80651057601813

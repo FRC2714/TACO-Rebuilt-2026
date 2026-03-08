@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Rotate Bot Outpost"
+            "pathName": "Rotate Bot Depot"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "outpost-start-score"
+            "pathName": "Start Depot Score"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "score-outpost"
+            "pathName": "Intake Depot"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "outpost-score"
+            "pathName": "Score depot"
           }
         },
         {

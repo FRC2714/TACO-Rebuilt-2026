@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "start-score"
+            "pathName": "Shoot Preload NZ"
           }
         },
         {
@@ -19,19 +19,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "score-outpost"
+            "pathName": "Start Intake NZ"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "WAIT"
+            "name": "INTAKE"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "outpost-score"
+            "pathName": "Intake NZ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Shoot NZ"
           }
         },
         {

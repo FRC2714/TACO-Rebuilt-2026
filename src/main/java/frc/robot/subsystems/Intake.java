@@ -22,7 +22,8 @@ public class Intake extends SubsystemBase {
   private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
 
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
-  private SparkFlex m_conveyor = new SparkFlex(Constants.Intake.kConveyorCanId, MotorType.kBrushless);
+  private SparkFlex m_conveyor =
+      new SparkFlex(Constants.Intake.kConveyorCanId, MotorType.kBrushless);
 
   private SparkSim rollerSim;
   private SparkSim conveyorSim;
@@ -36,6 +37,12 @@ public class Intake extends SubsystemBase {
   }
 
   private enum RollerSetpoints {
+    INTAKE,
+    EXTAKE,
+    STOP
+  }
+
+  private enum ConveyorSetpoints {
     INTAKE,
     EXTAKE,
     STOP
@@ -75,17 +82,17 @@ public class Intake extends SubsystemBase {
     m_roller.set(speed);
   }
 
-  private void setConveyorSpeed(RollerSetpoints setpoint) {
+  private void setConveyorSpeed(ConveyorSetpoints setpoint) {
     double speed;
     switch (setpoint) {
       case INTAKE:
-        speed = Constants.Intake.RollerSetpoints.kIntake;
+        speed = Constants.Intake.ConveyorSetpoints.kIntake;
         break;
       case EXTAKE:
-        speed = Constants.Intake.RollerSetpoints.kExtake;
+        speed = Constants.Intake.ConveyorSetpoints.kExtake;
         break;
       case STOP:
-        speed = Constants.Intake.RollerSetpoints.kStop;
+        speed = Constants.Intake.ConveyorSetpoints.kStop;
         break;
       default:
         return;
@@ -114,25 +121,26 @@ public class Intake extends SubsystemBase {
 
   public Command intakeCommand() {
     return this.startEnd(
-        () -> {
-          setPivot(PivotSetpoints.INTAKE);
-          setRollerSpeed(RollerSetpoints.INTAKE);
-        },
-        () -> {
-          m_roller.stopMotor();
-          m_conveyor.stopMotor();
-        })
+            () -> {
+              setPivot(PivotSetpoints.INTAKE);
+              setRollerSpeed(RollerSetpoints.INTAKE);
+              setConveyorSpeed(ConveyorSetpoints.INTAKE);
+            },
+            () -> {
+              m_roller.stopMotor();
+              m_conveyor.stopMotor();
+            })
         .withName("Intaking");
   }
 
   public Command conveyorCommand() {
     return this.startEnd(
-        () -> {
-          setConveyorSpeed(RollerSetpoints.INTAKE);
-        },
-        () -> {
-          m_conveyor.stopMotor();
-        })
+            () -> {
+              setConveyorSpeed(ConveyorSetpoints.INTAKE);
+            },
+            () -> {
+              m_conveyor.stopMotor();
+            })
         .withName("Conveyoring");
   }
 
@@ -141,6 +149,7 @@ public class Intake extends SubsystemBase {
         () -> {
           setPivot(PivotSetpoints.EXTAKE);
           setRollerSpeed(RollerSetpoints.EXTAKE);
+          setConveyorSpeed(ConveyorSetpoints.EXTAKE);
         });
   }
 
@@ -149,6 +158,7 @@ public class Intake extends SubsystemBase {
         () -> {
           setRollerSpeed(RollerSetpoints.STOP);
           setPivot(PivotSetpoints.STOW);
+          setConveyorSpeed(ConveyorSetpoints.STOP);
         });
   }
 

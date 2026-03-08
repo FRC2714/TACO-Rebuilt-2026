@@ -48,6 +48,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence().withTimeout(5));
     NamedCommands.registerCommand("INTAKE", m_intake.intakeCommand().withTimeout(5));
     NamedCommands.registerCommand("WAIT", new WaitCommand(5));
+    NamedCommands.registerCommand(
+        "ZERO DRIVER HEADING", new InstantCommand(() -> m_robotDrive.zeroDriverHeading()));
+    NamedCommands.registerCommand("FLIP POSE", new InstantCommand(() -> m_robotDrive.zeroPose()));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -87,11 +90,16 @@ public class RobotContainer {
         .back()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
 
-    // m_driverController.a().whileTrue(m_intake.extakeCommand());
+    // Intake Commands
     m_driverController.x().onTrue(m_intake.stowCommand());
     m_driverController.leftTrigger().whileTrue(m_intake.intakeCommand());
-    m_driverController.rightTrigger().whileTrue(m_superstructure.shooterSequence());
     m_driverController.povDown().whileTrue(m_intake.extakeCommand());
+
+    // Shoot Commands
+    m_driverController.rightTrigger().whileTrue(m_superstructure.shooterSequence());
+    m_driverController
+        .rightBumper()
+        .whileTrue(m_superstructure.passingSequence()); // Shoot without auto aligning (passing)
   }
 
   /**

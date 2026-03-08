@@ -96,12 +96,12 @@ public final class Configs {
       rollerConfig
           .inverted(false)
           .idleMode(IdleMode.kCoast)
-          .smartCurrentLimit(40)
+          .smartCurrentLimit(80)
           .voltageCompensation(12);
       conveyorConfig
           .inverted(false)
           .idleMode(IdleMode.kCoast)
-          .smartCurrentLimit(40)
+          .smartCurrentLimit(80)
           .voltageCompensation(12);
     }
   }

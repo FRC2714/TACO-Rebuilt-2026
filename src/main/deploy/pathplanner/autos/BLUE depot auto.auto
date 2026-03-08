@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start Depot Score"
+            "pathName": "Start Depot BLUE"
           }
         },
         {
@@ -38,18 +38,6 @@
           "type": "named",
           "data": {
             "name": "SCORE"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Depot Back to Start"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ZERO DRIVER HEADING"
           }
         }
       ]
