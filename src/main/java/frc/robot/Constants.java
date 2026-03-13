@@ -152,6 +152,7 @@ public final class Constants {
     public static final int kFeederMotorCanId = 5;
     public static final int kFlywheelMotorCanId = 6;
     public static final int kFlywheelFollowerMotorCanId = 7;
+    public static final double kFlywheelDebounceTimeSeconds = 0.1;
 
     public static final class FeederSetpoints {
       public static final double kFeed = 0.95;

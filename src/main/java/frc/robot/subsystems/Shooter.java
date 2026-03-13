@@ -9,6 +9,10 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +23,8 @@ import frc.robot.Configs;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FeederSetpoints;
 import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.math.interpolation.InverseInterpolator;
 
 public class Shooter extends SubsystemBase {
 
@@ -100,6 +106,14 @@ public class Shooter extends SubsystemBase {
               isFlywheelAt(-FlywheelSetpoints.kShootRpm)
                   || flywheelEncoder.getVelocity() < -FlywheelSetpoints.kShootRpm);
 
+  public record ShooterParams(double rpm, double timeOfFlight) {
+    public static ShooterParams interpolate(ShooterParams a, ShooterParams b, double t) {
+      double rpm = a.rpm + (b.rpm - a.rpm) * t;
+      double timeOfFlight = a.timeOfFlight + (b.timeOfFlight - a.timeOfFlight) * t;
+      return new ShooterParams(rpm, timeOfFlight);
+    }
+  }
+
   /** Trigger: Is the flywheel stopped? */
   public final Trigger isFlywheelStopped = new Trigger(() -> isFlywheelAt(0));
 
@@ -117,6 +131,73 @@ public class Shooter extends SubsystemBase {
     feederMotor.set(power);
   }
 
+  private static final InterpolatingTreeMap<Double, ShooterParams> shooterMap =
+    new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterParams::interpolate);
+
+  static {
+    // shooterMap.put(1.2, new ShooterParams(2650.0, 72.276537, 0.94));
+    // shooterMap.put(2.0, new ShooterParams(2714.0, 67.276537, 0.95));
+    // shooterMap.put(3.0, new ShooterParams(3050.0, 64.276537, 1.1));
+    // shooterMap.put(4.0, new ShooterParams(3450.0, 62.276537, 1.25));
+    // shooterMap.put(5.0, new ShooterParams(3800.0, 60.276537, 1.34));
+    // shooterMap.put(6.0, new ShooterParams(4275.0, 58.276537, 1.47));
+    // shooterMap.put(7.0, new ShooterParams(4800.0, 54.276537, 1.48));
+    // shooterMap.put(8.0, new ShooterParams(5750.0, 54.276537, 1.64));
+    // shooterMap.put(8.5, new ShooterParams(6300.0, 54.276537, 1.64)); TODO
+  }
+
+  public void calculate(
+      Translation2d robotPosition,
+      Rotation2d robotHeading,
+      Translation2d robotVelocity,
+      Translation2d goalPosition,
+      double latencyCompensation) {
+
+    Translation2d futurePos = robotPosition.plus(robotVelocity.times(latencyCompensation));
+    Translation2d relativePosition = goalPosition.minus(futurePos);
+    Translation2d relativeVelocity = robotVelocity.times(-1);
+
+    //ShooterParams rawParams = shooterMap.get(relativePosition.getNorm());
+    //this.rawFlywheelTarget = rawParams.rpm; Not needed? 
+    double timeOfFlight = 0.0;
+    Translation2d adjustedRelativePosition = relativePosition;
+
+    final int MAX_ITERATIONS = 10;
+    final double CONVERGENCE_THRESHOLD = 0.001;
+
+    for (int i = 0; i < MAX_ITERATIONS; i++) {
+      double distance = adjustedRelativePosition.getNorm();
+      ShooterParams params = shooterMap.get(distance);
+      double newTimeOfFlight = params.timeOfFlight;
+
+      // Check convergence before updating so we exit with the stable TOF value
+      if (Math.abs(newTimeOfFlight - timeOfFlight) < CONVERGENCE_THRESHOLD) {
+        timeOfFlight = newTimeOfFlight;
+        break;
+      }
+
+      timeOfFlight = newTimeOfFlight;
+
+      // Predict where the target will be (relative to the robot) when the
+      // gamepiece arrives: shift the relative position by relative velocity * TOF
+      adjustedRelativePosition = relativePosition.plus(relativeVelocity.times(timeOfFlight));
+    }
+
+    double adjustedDistance = adjustedRelativePosition.getNorm();
+    ShooterParams adjustedParams = shooterMap.get(adjustedDistance);
+    double requiredRpm = adjustedParams.rpm;
+
+    setFlywheelVelocity(requiredRpm);
+  }
+
+  private Debouncer flywheelDebouncer =
+    new Debouncer(ShooterConstants.kFlywheelDebounceTimeSeconds, DebounceType.kFalling);
+
+  public boolean flywheelAtSetpoint() {
+    boolean atSetpoint = Math.abs(flywheelEncoder.getVelocity() - flywheelTargetVelocity) < 300; //Should eb in constants? maybe needs to be tuned. 
+    return flywheelDebouncer.calculate(atSetpoint);
+  }
+  
   /**
    * Command to run the flywheel motors. When the command is interrupted, e.g. the button is
    * released, the motors will stop.
@@ -124,7 +205,7 @@ public class Shooter extends SubsystemBase {
   public Command runFlywheelCommand() {
     return this.startEnd(
             () -> {
-              this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+              this.setFlywheelVelocity(this.flywheelTargetVelocity);
             },
             () -> {
               this.setFlywheelVelocity(0.0);
@@ -175,7 +256,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command runShooter() {
-    return this.runOnce(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm))
+    return this.runOnce(() -> this.setFlywheelVelocity(this.flywheelTargetVelocity))
         .until(isFlywheelSpinning)
         .andThen(
             this.runOnce(
