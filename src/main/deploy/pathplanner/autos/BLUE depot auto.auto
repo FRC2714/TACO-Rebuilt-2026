@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "start-score"
+            "pathName": "Start Depot BLUE"
           }
         },
         {
@@ -19,19 +19,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "score-outpost"
+            "pathName": "Intake Depot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "WAIT"
+            "name": "INTAKE"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "outpost-score"
+            "pathName": "Score depot"
           }
         },
         {

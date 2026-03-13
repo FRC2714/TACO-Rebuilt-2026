@@ -42,6 +42,12 @@ public class Intake extends SubsystemBase {
     STOP
   }
 
+  private enum ConveyorSetpoints {
+    INTAKE,
+    EXTAKE,
+    STOP
+  }
+
   public Intake() {
     // Constructor code here
     m_pivot.configure(
@@ -74,6 +80,23 @@ public class Intake extends SubsystemBase {
         return;
     }
     m_roller.set(speed);
+  }
+
+  private void setConveyorSpeed(ConveyorSetpoints setpoint) {
+    double speed;
+    switch (setpoint) {
+      case INTAKE:
+        speed = Constants.Intake.ConveyorSetpoints.kIntake;
+        break;
+      case EXTAKE:
+        speed = Constants.Intake.ConveyorSetpoints.kExtake;
+        break;
+      case STOP:
+        speed = Constants.Intake.ConveyorSetpoints.kStop;
+        break;
+      default:
+        return;
+    }
     m_conveyor.set(speed);
   }
 
@@ -101,6 +124,7 @@ public class Intake extends SubsystemBase {
             () -> {
               setPivot(PivotSetpoints.INTAKE);
               setRollerSpeed(RollerSetpoints.INTAKE);
+              setConveyorSpeed(ConveyorSetpoints.INTAKE);
             },
             () -> {
               m_roller.stopMotor();
@@ -109,11 +133,23 @@ public class Intake extends SubsystemBase {
         .withName("Intaking");
   }
 
+  public Command conveyorCommand() {
+    return this.startEnd(
+            () -> {
+              setConveyorSpeed(ConveyorSetpoints.INTAKE);
+            },
+            () -> {
+              m_conveyor.stopMotor();
+            })
+        .withName("Conveyoring");
+  }
+
   public Command extakeCommand() {
     return this.run(
         () -> {
           setPivot(PivotSetpoints.EXTAKE);
           setRollerSpeed(RollerSetpoints.EXTAKE);
+          setConveyorSpeed(ConveyorSetpoints.EXTAKE);
         });
   }
 
@@ -122,17 +158,19 @@ public class Intake extends SubsystemBase {
         () -> {
           setRollerSpeed(RollerSetpoints.STOP);
           setPivot(PivotSetpoints.STOW);
+          setConveyorSpeed(ConveyorSetpoints.STOP);
         });
   }
 
   // public boolean atSetpoint() {
-  //   return Math.abs(m_pivotEncoder.getPosition() - pivotSetpoint)
-  //       <= Constants.Intake.kPivotThreshold;
+  // return Math.abs(m_pivotEncoder.getPosition() - pivotSetpoint)
+  // <= Constants.Intake.kPivotThreshold;
   // }
 
   @Override
   public void periodic() {
-    // SmartDashboard.putNumber("Intake/Pivot/Position", m_pivotEncoder.getPosition());
+    // SmartDashboard.putNumber("Intake/Pivot/Position",
+    // m_pivotEncoder.getPosition());
     SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSpeed);
     // SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
   }

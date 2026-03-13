@@ -185,12 +185,13 @@ public class Shooter extends SubsystemBase {
                 }));
   }
 
+  public void stopAll() {
+    flywheelMotor.stopMotor();
+    feederMotor.stopMotor();
+  }
+
   public Command stopShooter() {
-    return new InstantCommand(
-        () -> {
-          flywheelMotor.stopMotor();
-          feederMotor.stopMotor();
-        });
+    return new InstantCommand(this::stopAll);
   }
 
   @Override

@@ -115,8 +115,14 @@ public final class Constants {
     public static final double kP = 0.06;
 
     public static final class RollerSetpoints {
-      public static final double kIntake = -0.5;
-      public static final double kExtake = 0.4;
+      public static final double kIntake = 1;
+      public static final double kExtake = -0.75;
+      public static final double kStop = 0;
+    }
+
+    public static final class ConveyorSetpoints {
+      public static final double kIntake = -1;
+      public static final double kExtake = 0.75;
       public static final double kStop = 0;
     }
 
@@ -135,6 +141,13 @@ public final class Constants {
     public static final Matrix<N3, N1> m_visionStdDevs = VecBuilder.fill(0.7, 0.7, 999999);
   }
 
+  public static final class AutoAlignConstants {
+    public static final double kP = 0.08;
+    public static final double kI = 0;
+    public static final double kD = 0.005;
+    public static final double kAlignTolerance = 1.0; // degrees of tx error
+  }
+
   public static final class ShooterConstants {
     public static final int kFeederMotorCanId = 5;
     public static final int kFlywheelMotorCanId = 6;
@@ -145,7 +158,7 @@ public final class Constants {
     }
 
     public static final class FlywheelSetpoints {
-      public static final double kShootRpm = 3200;
+      public static final double kShootRpm = 2400;
       public static final double kVelocityTolerance = 100;
     }
   }
