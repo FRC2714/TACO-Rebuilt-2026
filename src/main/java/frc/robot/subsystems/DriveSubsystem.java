@@ -153,10 +153,11 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
         });
 
+    double poseHeadingDeg = getPose().getRotation().getDegrees();
     LimelightHelpers.SetRobotOrientation(
-        LimelightConstants.kFrontName, getHeadingDegrees(), 0, 0, 0, 0, 0);
+        LimelightConstants.kFrontName, poseHeadingDeg, 0, 0, 0, 0, 0);
     LimelightHelpers.SetRobotOrientation(
-        LimelightConstants.kBackName, getHeadingDegrees(), 0, 0, 0, 0, 0);
+        LimelightConstants.kBackName, poseHeadingDeg, 0, 0, 0, 0, 0);
     LimelightHelpers.Flush();
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
@@ -236,7 +237,7 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
-    double driverRelativeHeading = getHeadingDegrees() - m_driverHeadingOffsetDeg;
+    double driverRelativeHeading = getPose().getRotation().getDegrees() - m_driverHeadingOffsetDeg;
 
     if (aligning || shooting) {
       rotDelivered = alignRotSpeed;
@@ -311,7 +312,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Sets the current heading as the driver's forward direction. */
   public void zeroDriverHeading() {
-    m_driverHeadingOffsetDeg = getHeadingDegrees();
+    m_driverHeadingOffsetDeg = getPose().getRotation().getDegrees();
   }
 
   /** Resets pose to origin and re-seeds Limelight IMU. */
