@@ -105,12 +105,7 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(
             m_intake
-                .intakeCommand()
-                .alongWith(
-                    m_shooter
-                        .runFeederOnlyCommand(
-                            Constants.ShooterConstants.FeederSetpoints.kFeed * 0.2)
-                        .withTimeout(2)));
+                .intakeCommand());
     m_driverController.povDown().whileTrue(m_intake.extakeCommand());
 
     // Shoot Commands
