@@ -116,13 +116,13 @@ public final class Constants {
 
     public static final class RollerSetpoints {
       public static final double kIntake = 1;
-      public static final double kExtake = -0.75;
+      public static final double kExtake = -1;
       public static final double kStop = 0;
     }
 
     public static final class ConveyorSetpoints {
       public static final double kIntake = -1;
-      public static final double kExtake = 0.75;
+      public static final double kExtake = 1;
       public static final double kStop = 0;
     }
 
