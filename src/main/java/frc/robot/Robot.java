@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    double heading = m_robotContainer.m_robotDrive.getHeadingDegrees();
+    double heading = m_robotContainer.m_robotDrive.getPose().getRotation().getDegrees();
     LimelightHelpers.SetRobotOrientation(LimelightConstants.kFrontName, heading, 0, 0, 0, 0, 0);
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 1);
 
@@ -92,6 +92,10 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    // Sync driver heading with pose estimator so field-relative
+    // driving works correctly on both alliances after auton.
+    m_robotContainer.m_robotDrive.zeroDriverHeading();
   }
 
   /** This function is called periodically during operator control. */

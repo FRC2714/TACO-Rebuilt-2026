@@ -266,6 +266,12 @@ public class Shooter extends SubsystemBase {
                 }));
   }
 
+  /** Command to run only the feeder motor at the given power. No flywheel. */
+  public Command runFeederOnlyCommand(double power) {
+    return this.startEnd(() -> this.setFeederPower(power), () -> this.setFeederPower(0.0))
+        .withName("Feeder Only");
+  }
+
   public void stopAll() {
     flywheelMotor.stopMotor();
     feederMotor.stopMotor();

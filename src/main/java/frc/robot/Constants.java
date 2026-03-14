@@ -159,7 +159,7 @@ public final class Constants {
     }
 
     public static final class FlywheelSetpoints {
-      public static final double kShootRpm = 2400;
+      public static final double kShootRpm = 2200;
       public static final double kVelocityTolerance = 100;
     }
   }
