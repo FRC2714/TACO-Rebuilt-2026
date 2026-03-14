@@ -6,12 +6,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Field;
 
@@ -55,13 +55,19 @@ public class Superstructure extends SubsystemBase {
   @Override
   public void periodic() {
     Pose2d pose = m_driveSubsystem.getPose();
+    Translation2d robotPosition = pose.getTranslation();
     Translation2d goalPosition = Field.getAllianceHub().toTranslation2d();
 
-    double distanceToHub = pose.getTranslation().getDistance(goalPosition);
+    double distanceToHub = robotPosition.getDistance(goalPosition);
     SmartDashboard.putNumber("Distance to Hub", distanceToHub);
 
+    // Continuously compute the heading angle to the hub
+    Translation2d robotToGoal = goalPosition.minus(robotPosition);
+    double angleToHub = Math.toDegrees(Math.atan2(robotToGoal.getY(), robotToGoal.getX()));
+    m_driveSubsystem.setTargetHeading(angleToHub);
+
     m_shooter.calculate(
-        pose.getTranslation(),
+        robotPosition,
         pose.getRotation(),
         new Translation2d(),
         goalPosition,

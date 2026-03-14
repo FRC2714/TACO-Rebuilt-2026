@@ -145,11 +145,15 @@ public class Intake extends SubsystemBase {
   }
 
   public Command extakeCommand() {
-    return this.run(
-        () -> {
+    return this.startEnd(
+        (() -> {
           setPivot(PivotSetpoints.EXTAKE);
           setRollerSpeed(RollerSetpoints.EXTAKE);
           setConveyorSpeed(ConveyorSetpoints.EXTAKE);
+        }), 
+        () -> {
+          setRollerSpeed(RollerSetpoints.STOP);
+          setConveyorSpeed(ConveyorSetpoints.STOP);
         });
   }
 

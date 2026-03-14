@@ -26,11 +26,9 @@ public final class FieldConstants {
 
     // Blue alliance hub (anchored to AprilTag 26)
     public static final Translation3d topCenterPoint =
-        new Translation3d(
-            tagPose(26).getX() + width / 2.0, fieldWidth / 2.0, height);
+        new Translation3d(tagPose(26).getX() + width / 2.0, fieldWidth / 2.0, height);
     public static final Translation3d innerCenterPoint =
-        new Translation3d(
-            tagPose(26).getX() + width / 2.0, fieldWidth / 2.0, innerHeight);
+        new Translation3d(tagPose(26).getX() + width / 2.0, fieldWidth / 2.0, innerHeight);
 
     public static final Translation2d nearLeftCorner =
         new Translation2d(topCenterPoint.getX() - width / 2.0, fieldWidth / 2.0 + width / 2.0);
@@ -43,21 +41,16 @@ public final class FieldConstants {
 
     // Red (opponent) hub (anchored to AprilTag 4)
     public static final Translation3d oppTopCenterPoint =
-        new Translation3d(
-            tagPose(4).getX() + width / 2.0, fieldWidth / 2.0, height);
+        new Translation3d(tagPose(4).getX() + width / 2.0, fieldWidth / 2.0, height);
 
     public static final Translation2d oppNearLeftCorner =
-        new Translation2d(
-            oppTopCenterPoint.getX() - width / 2.0, fieldWidth / 2.0 + width / 2.0);
+        new Translation2d(oppTopCenterPoint.getX() - width / 2.0, fieldWidth / 2.0 + width / 2.0);
     public static final Translation2d oppNearRightCorner =
-        new Translation2d(
-            oppTopCenterPoint.getX() - width / 2.0, fieldWidth / 2.0 - width / 2.0);
+        new Translation2d(oppTopCenterPoint.getX() - width / 2.0, fieldWidth / 2.0 - width / 2.0);
     public static final Translation2d oppFarLeftCorner =
-        new Translation2d(
-            oppTopCenterPoint.getX() + width / 2.0, fieldWidth / 2.0 + width / 2.0);
+        new Translation2d(oppTopCenterPoint.getX() + width / 2.0, fieldWidth / 2.0 + width / 2.0);
     public static final Translation2d oppFarRightCorner =
-        new Translation2d(
-            oppTopCenterPoint.getX() + width / 2.0, fieldWidth / 2.0 - width / 2.0);
+        new Translation2d(oppTopCenterPoint.getX() + width / 2.0, fieldWidth / 2.0 - width / 2.0);
   }
 
   public static final class LinesVertical {

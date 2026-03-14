@@ -13,6 +13,8 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,8 +25,6 @@ import frc.robot.Configs;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FeederSetpoints;
 import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
-import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
-import edu.wpi.first.math.interpolation.InverseInterpolator;
 
 public class Shooter extends SubsystemBase {
 
@@ -97,8 +97,11 @@ public class Shooter extends SubsystemBase {
 
   /** Trigger: Is the flywheel spinning at the calculated target velocity? */
   public final Trigger isFlywheelSpinning =
-      new Trigger(() -> Math.abs(flywheelEncoder.getVelocity() - calculatedRpm) < FlywheelSetpoints.kVelocityTolerance
-          || flywheelEncoder.getVelocity() > calculatedRpm);
+      new Trigger(
+          () ->
+              Math.abs(flywheelEncoder.getVelocity() - calculatedRpm)
+                      < FlywheelSetpoints.kVelocityTolerance
+                  || flywheelEncoder.getVelocity() > calculatedRpm);
 
   public final Trigger isFlywheelSpinningBackwards =
       new Trigger(() -> flywheelEncoder.getVelocity() < -calculatedRpm);
@@ -129,7 +132,7 @@ public class Shooter extends SubsystemBase {
   }
 
   private static final InterpolatingTreeMap<Double, ShooterParams> shooterMap =
-    new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterParams::interpolate);
+      new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterParams::interpolate);
 
   static {
     // TODO: Tune these values on the actual robot
@@ -137,7 +140,7 @@ public class Shooter extends SubsystemBase {
     shooterMap.put(2.68, new ShooterParams(2200, 1.09));
     shooterMap.put(2.9464, new ShooterParams(2300, 1.27));
     shooterMap.put(3.17, new ShooterParams(2300, 1.2));
-    shooterMap.put(4.65, new ShooterParams(4200, 1.4));
+    shooterMap.put(4.65, new ShooterParams(3600, 1.4));
   }
 
   public void calculate(
@@ -151,8 +154,8 @@ public class Shooter extends SubsystemBase {
     Translation2d relativePosition = goalPosition.minus(futurePos);
     Translation2d relativeVelocity = robotVelocity.times(-1);
 
-    //ShooterParams rawParams = shooterMap.get(relativePosition.getNorm());
-    //this.rawFlywheelTarget = rawParams.rpm; Not needed? 
+    // ShooterParams rawParams = shooterMap.get(relativePosition.getNorm());
+    // this.rawFlywheelTarget = rawParams.rpm; Not needed?
     double timeOfFlight = 0.0;
     Translation2d adjustedRelativePosition = relativePosition;
 
@@ -191,13 +194,15 @@ public class Shooter extends SubsystemBase {
   }
 
   private Debouncer flywheelDebouncer =
-    new Debouncer(ShooterConstants.kFlywheelDebounceTimeSeconds, DebounceType.kFalling);
+      new Debouncer(ShooterConstants.kFlywheelDebounceTimeSeconds, DebounceType.kFalling);
 
   public boolean flywheelAtSetpoint() {
-    boolean atSetpoint = Math.abs(flywheelEncoder.getVelocity() - flywheelTargetVelocity) < 300; //Should eb in constants? maybe needs to be tuned. 
+    boolean atSetpoint =
+        Math.abs(flywheelEncoder.getVelocity() - flywheelTargetVelocity)
+            < 300; // Should eb in constants? maybe needs to be tuned.
     return flywheelDebouncer.calculate(atSetpoint);
   }
-  
+
   /**
    * Command to run the flywheel motors. When the command is interrupted, e.g. the button is
    * released, the motors will stop.
