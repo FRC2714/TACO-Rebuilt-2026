@@ -56,6 +56,8 @@ public class Shooter extends SubsystemBase {
 
   // Member variables for subsystem state management
   private double flywheelTargetVelocity = 0.0;
+  private double calculatedRpm = FlywheelSetpoints.kShootRpm;
+  private boolean isShooting = false;
 
   /** Creates a new ShooterSubsystem. */
   public Shooter() {
@@ -93,18 +95,13 @@ public class Shooter extends SubsystemBase {
         flywheelEncoder.getVelocity(), velocity, FlywheelSetpoints.kVelocityTolerance);
   }
 
-  /** Trigger: Is the flywheel spinning at the required velocity? */
+  /** Trigger: Is the flywheel spinning at the calculated target velocity? */
   public final Trigger isFlywheelSpinning =
-      new Trigger(
-          () ->
-              isFlywheelAt(FlywheelSetpoints.kShootRpm)
-                  || flywheelEncoder.getVelocity() > FlywheelSetpoints.kShootRpm);
+      new Trigger(() -> Math.abs(flywheelEncoder.getVelocity() - calculatedRpm) < FlywheelSetpoints.kVelocityTolerance
+          || flywheelEncoder.getVelocity() > calculatedRpm);
 
   public final Trigger isFlywheelSpinningBackwards =
-      new Trigger(
-          () ->
-              isFlywheelAt(-FlywheelSetpoints.kShootRpm)
-                  || flywheelEncoder.getVelocity() < -FlywheelSetpoints.kShootRpm);
+      new Trigger(() -> flywheelEncoder.getVelocity() < -calculatedRpm);
 
   public record ShooterParams(double rpm, double timeOfFlight) {
     public static ShooterParams interpolate(ShooterParams a, ShooterParams b, double t) {
@@ -135,15 +132,12 @@ public class Shooter extends SubsystemBase {
     new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterParams::interpolate);
 
   static {
-    // shooterMap.put(1.2, new ShooterParams(2650.0, 72.276537, 0.94));
-    // shooterMap.put(2.0, new ShooterParams(2714.0, 67.276537, 0.95));
-    // shooterMap.put(3.0, new ShooterParams(3050.0, 64.276537, 1.1));
-    // shooterMap.put(4.0, new ShooterParams(3450.0, 62.276537, 1.25));
-    // shooterMap.put(5.0, new ShooterParams(3800.0, 60.276537, 1.34));
-    // shooterMap.put(6.0, new ShooterParams(4275.0, 58.276537, 1.47));
-    // shooterMap.put(7.0, new ShooterParams(4800.0, 54.276537, 1.48));
-    // shooterMap.put(8.0, new ShooterParams(5750.0, 54.276537, 1.64));
-    // shooterMap.put(8.5, new ShooterParams(6300.0, 54.276537, 1.64)); TODO
+    // TODO: Tune these values on the actual robot
+    shooterMap.put(1.626, new ShooterParams(1850, 0.89));
+    shooterMap.put(2.68, new ShooterParams(2200, 1.09));
+    shooterMap.put(2.9464, new ShooterParams(2300, 1.27));
+    shooterMap.put(3.17, new ShooterParams(2300, 1.2));
+    shooterMap.put(4.65, new ShooterParams(4200, 1.4));
   }
 
   public void calculate(
@@ -185,9 +179,15 @@ public class Shooter extends SubsystemBase {
 
     double adjustedDistance = adjustedRelativePosition.getNorm();
     ShooterParams adjustedParams = shooterMap.get(adjustedDistance);
-    double requiredRpm = adjustedParams.rpm;
+    calculatedRpm = adjustedParams.rpm * ShooterConstants.kRpmScaleFactor;
+  }
 
-    setFlywheelVelocity(requiredRpm);
+  public double getCalculatedRpm() {
+    return calculatedRpm;
+  }
+
+  public void setIsShooting(boolean shooting) {
+    this.isShooting = shooting;
   }
 
   private Debouncer flywheelDebouncer =
@@ -205,7 +205,7 @@ public class Shooter extends SubsystemBase {
   public Command runFlywheelCommand() {
     return this.startEnd(
             () -> {
-              this.setFlywheelVelocity(this.flywheelTargetVelocity);
+              this.setFlywheelVelocity(calculatedRpm);
             },
             () -> {
               this.setFlywheelVelocity(0.0);
@@ -220,7 +220,7 @@ public class Shooter extends SubsystemBase {
   public Command runFeederCommand() {
     return this.startEnd(
             () -> {
-              this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+              this.setFlywheelVelocity(calculatedRpm);
               this.setFeederPower(FeederSetpoints.kFeed);
             },
             () -> {
@@ -236,14 +236,14 @@ public class Shooter extends SubsystemBase {
    */
   public Command runShooterCommand() {
     Command spinUntilUp =
-        this.startEnd(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm), () -> {})
+        this.startEnd(() -> this.setFlywheelVelocity(calculatedRpm), () -> {})
             .until(isFlywheelSpinning)
             .withName("SpinUntilUp");
 
     Command feederPhase =
         this.startEnd(
                 () -> {
-                  this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+                  this.setFlywheelVelocity(calculatedRpm);
                   this.setFeederPower(FeederSetpoints.kFeed);
                 },
                 () -> {
@@ -256,12 +256,12 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command runShooter() {
-    return this.runOnce(() -> this.setFlywheelVelocity(this.flywheelTargetVelocity))
+    return this.runOnce(() -> this.setFlywheelVelocity(calculatedRpm))
         .until(isFlywheelSpinning)
         .andThen(
             this.runOnce(
                 () -> {
-                  this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+                  this.setFlywheelVelocity(calculatedRpm);
                   this.setFeederPower(FeederSetpoints.kFeed);
                 }));
   }
@@ -300,6 +300,7 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putBoolean("Is Flywheel Spinning", isFlywheelSpinning.getAsBoolean());
     SmartDashboard.putBoolean("Is Flywheel Stopped", isFlywheelStopped.getAsBoolean());
+    SmartDashboard.putNumber("Shooter | Calculated RPM", calculatedRpm);
   }
 
   @Override

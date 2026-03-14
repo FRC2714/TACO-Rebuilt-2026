@@ -4,11 +4,16 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.Field;
 
 public class Superstructure extends SubsystemBase {
   private DriveSubsystem m_driveSubsystem;
@@ -49,6 +54,17 @@ public class Superstructure extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    Pose2d pose = m_driveSubsystem.getPose();
+    Translation2d goalPosition = Field.getAllianceHub().toTranslation2d();
+
+    double distanceToHub = pose.getTranslation().getDistance(goalPosition);
+    SmartDashboard.putNumber("Distance to Hub", distanceToHub);
+
+    m_shooter.calculate(
+        pose.getTranslation(),
+        pose.getRotation(),
+        new Translation2d(),
+        goalPosition,
+        ShooterConstants.kLatencyCompensation);
   }
 }
