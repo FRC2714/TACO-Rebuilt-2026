@@ -96,8 +96,8 @@ public class DriveSubsystem extends SubsystemBase {
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     SmartDashboard.putData("Field", m_field2d);
 
-    LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 1);
-    LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 1);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 4);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 4);
 
     RobotConfig config =
         new RobotConfig(
@@ -165,7 +165,10 @@ public class DriveSubsystem extends SubsystemBase {
     var frontMeasurement =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontName);
 
-    if (Math.abs(omegaRps) < 1 && frontMeasurement != null && frontMeasurement.tagCount > 0) {
+    if (Math.abs(omegaRps) < 1
+        && frontMeasurement != null
+        && frontMeasurement.tagCount > 0
+        && isValidPose(frontMeasurement.pose)) {
       double xyStdDev = 0.7 * (1 + frontMeasurement.avgTagDist * 0.5);
       m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
       m_poseEstimator.addVisionMeasurement(
@@ -175,7 +178,10 @@ public class DriveSubsystem extends SubsystemBase {
     var backMeasurement =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kBackName);
 
-    if (Math.abs(omegaRps) < 1 && backMeasurement != null && backMeasurement.tagCount > 0) {
+    if (Math.abs(omegaRps) < 1
+        && backMeasurement != null
+        && backMeasurement.tagCount > 0
+        && isValidPose(backMeasurement.pose)) {
       double xyStdDev = 0.7 * (1 + backMeasurement.avgTagDist * 0.5);
       m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
       m_poseEstimator.addVisionMeasurement(backMeasurement.pose, backMeasurement.timestampSeconds);
@@ -329,10 +335,28 @@ public class DriveSubsystem extends SubsystemBase {
         },
         pose);
 
+    // Seed orientation, then switch to fused IMU mode after a brief delay
     LimelightHelpers.SetRobotOrientation(LimelightConstants.kFrontName, 0, 0, 0, 0, 0, 0);
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 1);
     LimelightHelpers.SetRobotOrientation(LimelightConstants.kBackName, 0, 0, 0, 0, 0, 0);
     LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 1);
+
+    edu.wpi.first.wpilibj2.command.Commands.waitSeconds(0.1)
+        .andThen(
+            edu.wpi.first.wpilibj2.command.Commands.runOnce(
+                () -> {
+                  LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 4);
+                  LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 4);
+                }))
+        .schedule();
+  }
+
+  /** Returns true if the pose is within the FRC field boundaries and not at the origin. */
+  private boolean isValidPose(Pose2d pose) {
+    double x = pose.getX();
+    double y = pose.getY();
+    // Reject poses at origin (default/uninitialized) or outside field bounds
+    return x > 0.5 && x < 16.0 && y > 0.5 && y < 8.0;
   }
 
   /**

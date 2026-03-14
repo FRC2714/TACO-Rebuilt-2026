@@ -46,7 +46,16 @@ public class RobotContainer {
   public RobotContainer() {
 
     NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence().withTimeout(5));
-    NamedCommands.registerCommand("INTAKE", m_intake.intakeCommand().withTimeout(5));
+    NamedCommands.registerCommand(
+        "INTAKE",
+        m_intake
+            .intakeCommand()
+            .alongWith(
+                m_shooter
+                    .runFeederOnlyCommand(
+                        Constants.ShooterConstants.FeederSetpoints.kFeed * 0.2)
+                    .withTimeout(2))
+            .withTimeout(5));
     NamedCommands.registerCommand("WAIT", new WaitCommand(5));
     NamedCommands.registerCommand(
         "ZERO DRIVER HEADING", new InstantCommand(() -> m_robotDrive.zeroDriverHeading()));
@@ -92,7 +101,16 @@ public class RobotContainer {
 
     // Intake Commands
     m_driverController.x().onTrue(m_intake.stowCommand());
-    m_driverController.leftTrigger().whileTrue(m_intake.intakeCommand());
+    m_driverController
+        .leftTrigger()
+        .whileTrue(
+            m_intake
+                .intakeCommand()
+                .alongWith(
+                    m_shooter
+                        .runFeederOnlyCommand(
+                            Constants.ShooterConstants.FeederSetpoints.kFeed * 0.2)
+                        .withTimeout(2)));
     m_driverController.povDown().whileTrue(m_intake.extakeCommand());
 
     // Shoot Commands
