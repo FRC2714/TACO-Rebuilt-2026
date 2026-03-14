@@ -150,7 +150,7 @@ public class Intake extends SubsystemBase {
           setPivot(PivotSetpoints.EXTAKE);
           setRollerSpeed(RollerSetpoints.EXTAKE);
           setConveyorSpeed(ConveyorSetpoints.EXTAKE);
-        }), 
+        }),
         () -> {
           setRollerSpeed(RollerSetpoints.STOP);
           setConveyorSpeed(ConveyorSetpoints.STOP);

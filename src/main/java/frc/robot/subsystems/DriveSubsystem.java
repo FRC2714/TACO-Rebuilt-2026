@@ -203,8 +203,8 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("AutoAlign/Aligning", aligning);
     SmartDashboard.putBoolean("AutoAlign/Aligned", isAligned());
     SmartDashboard.putNumber("AutoAlign/TargetHeading", targetHeadingDeg);
-    SmartDashboard.putNumber("AutoAlign/HeadingError",
-        targetHeadingDeg - getPose().getRotation().getDegrees());
+    SmartDashboard.putNumber(
+        "AutoAlign/HeadingError", targetHeadingDeg - getPose().getRotation().getDegrees());
   }
 
   /**
