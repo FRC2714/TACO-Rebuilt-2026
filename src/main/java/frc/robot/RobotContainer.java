@@ -52,8 +52,7 @@ public class RobotContainer {
             .intakeCommand()
             .alongWith(
                 m_shooter
-                    .runFeederOnlyCommand(
-                        Constants.ShooterConstants.FeederSetpoints.kFeed * 0.2)
+                    .runFeederOnlyCommand(Constants.ShooterConstants.FeederSetpoints.kFeed * 0.2)
                     .withTimeout(2))
             .withTimeout(5));
     NamedCommands.registerCommand("WAIT", new WaitCommand(5));
@@ -101,11 +100,7 @@ public class RobotContainer {
 
     // Intake Commands
     m_driverController.x().onTrue(m_intake.stowCommand());
-    m_driverController
-        .leftTrigger()
-        .whileTrue(
-            m_intake
-                .intakeCommand());
+    m_driverController.leftTrigger().whileTrue(m_intake.intakeCommand());
     m_driverController.povDown().whileTrue(m_intake.extakeCommand());
 
     // Shoot Commands
