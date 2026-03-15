@@ -140,7 +140,9 @@ public class Shooter extends SubsystemBase {
     shooterMap.put(2.68, new ShooterParams(2200, 1.09));
     shooterMap.put(2.9464, new ShooterParams(2300, 1.27));
     shooterMap.put(3.17, new ShooterParams(2300, 1.2));
-    shooterMap.put(4.65, new ShooterParams(3600, 1.4));
+    shooterMap.put(4.2, new ShooterParams(3000, 1.3));
+    shooterMap.put(4.5, new ShooterParams(3700, 1.3));
+    shooterMap.put(4.65, new ShooterParams(4000, 1.4));
   }
 
   public void calculate(

@@ -31,7 +31,7 @@ public class Superstructure extends SubsystemBase {
             m_shooter.runShooterCommand(),
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> m_shooter.isFlywheelSpinning.getAsBoolean()),
-                m_intake.conveyorCommand()))
+                m_intake.conveyorWithRollerCommand()))
         .beforeStarting(() -> m_driveSubsystem.setAligning(true))
         .finallyDo(
             () -> {
@@ -45,7 +45,7 @@ public class Superstructure extends SubsystemBase {
             m_shooter.runShooterCommand(),
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> m_shooter.isFlywheelSpinning.getAsBoolean()),
-                m_intake.conveyorCommand()))
+                m_intake.conveyorWithRollerCommand()))
         .finallyDo(
             () -> {
               m_shooter.stopAll();

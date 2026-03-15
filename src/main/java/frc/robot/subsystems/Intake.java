@@ -133,13 +133,15 @@ public class Intake extends SubsystemBase {
         .withName("Intaking");
   }
 
-  public Command conveyorCommand() {
+  public Command conveyorWithRollerCommand() {
     return this.startEnd(
             () -> {
               setConveyorSpeed(ConveyorSetpoints.INTAKE);
+              setRollerSpeed(RollerSetpoints.INTAKE);
             },
             () -> {
               m_conveyor.stopMotor();
+              m_roller.stopMotor();
             })
         .withName("Conveyoring");
   }
