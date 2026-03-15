@@ -9,6 +9,12 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,6 +56,8 @@ public class Shooter extends SubsystemBase {
 
   // Member variables for subsystem state management
   private double flywheelTargetVelocity = 0.0;
+  private double calculatedRpm = FlywheelSetpoints.kShootRpm;
+  private boolean isShooting = false;
 
   /** Creates a new ShooterSubsystem. */
   public Shooter() {
@@ -87,18 +95,24 @@ public class Shooter extends SubsystemBase {
         flywheelEncoder.getVelocity(), velocity, FlywheelSetpoints.kVelocityTolerance);
   }
 
-  /** Trigger: Is the flywheel spinning at the required velocity? */
+  /** Trigger: Is the flywheel spinning at the calculated target velocity? */
   public final Trigger isFlywheelSpinning =
       new Trigger(
           () ->
-              isFlywheelAt(FlywheelSetpoints.kShootRpm)
-                  || flywheelEncoder.getVelocity() > FlywheelSetpoints.kShootRpm);
+              Math.abs(flywheelEncoder.getVelocity() - calculatedRpm)
+                      < FlywheelSetpoints.kVelocityTolerance
+                  || flywheelEncoder.getVelocity() > calculatedRpm);
 
   public final Trigger isFlywheelSpinningBackwards =
-      new Trigger(
-          () ->
-              isFlywheelAt(-FlywheelSetpoints.kShootRpm)
-                  || flywheelEncoder.getVelocity() < -FlywheelSetpoints.kShootRpm);
+      new Trigger(() -> flywheelEncoder.getVelocity() < -calculatedRpm);
+
+  public record ShooterParams(double rpm, double timeOfFlight) {
+    public static ShooterParams interpolate(ShooterParams a, ShooterParams b, double t) {
+      double rpm = a.rpm + (b.rpm - a.rpm) * t;
+      double timeOfFlight = a.timeOfFlight + (b.timeOfFlight - a.timeOfFlight) * t;
+      return new ShooterParams(rpm, timeOfFlight);
+    }
+  }
 
   /** Trigger: Is the flywheel stopped? */
   public final Trigger isFlywheelStopped = new Trigger(() -> isFlywheelAt(0));
@@ -117,6 +131,78 @@ public class Shooter extends SubsystemBase {
     feederMotor.set(power);
   }
 
+  private static final InterpolatingTreeMap<Double, ShooterParams> shooterMap =
+      new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterParams::interpolate);
+
+  static {
+    // TODO: Tune these values on the actual robot
+    shooterMap.put(1.626, new ShooterParams(1850, 0.89));
+    shooterMap.put(2.68, new ShooterParams(2200, 1.09));
+    shooterMap.put(2.9464, new ShooterParams(2300, 1.27));
+    shooterMap.put(3.17, new ShooterParams(2300, 1.2));
+    shooterMap.put(4.65, new ShooterParams(3600, 1.4));
+  }
+
+  public void calculate(
+      Translation2d robotPosition,
+      Rotation2d robotHeading,
+      Translation2d robotVelocity,
+      Translation2d goalPosition,
+      double latencyCompensation) {
+
+    Translation2d futurePos = robotPosition.plus(robotVelocity.times(latencyCompensation));
+    Translation2d relativePosition = goalPosition.minus(futurePos);
+    Translation2d relativeVelocity = robotVelocity.times(-1);
+
+    // ShooterParams rawParams = shooterMap.get(relativePosition.getNorm());
+    // this.rawFlywheelTarget = rawParams.rpm; Not needed?
+    double timeOfFlight = 0.0;
+    Translation2d adjustedRelativePosition = relativePosition;
+
+    final int MAX_ITERATIONS = 10;
+    final double CONVERGENCE_THRESHOLD = 0.001;
+
+    for (int i = 0; i < MAX_ITERATIONS; i++) {
+      double distance = adjustedRelativePosition.getNorm();
+      ShooterParams params = shooterMap.get(distance);
+      double newTimeOfFlight = params.timeOfFlight;
+
+      // Check convergence before updating so we exit with the stable TOF value
+      if (Math.abs(newTimeOfFlight - timeOfFlight) < CONVERGENCE_THRESHOLD) {
+        timeOfFlight = newTimeOfFlight;
+        break;
+      }
+
+      timeOfFlight = newTimeOfFlight;
+
+      // Predict where the target will be (relative to the robot) when the
+      // gamepiece arrives: shift the relative position by relative velocity * TOF
+      adjustedRelativePosition = relativePosition.plus(relativeVelocity.times(timeOfFlight));
+    }
+
+    double adjustedDistance = adjustedRelativePosition.getNorm();
+    ShooterParams adjustedParams = shooterMap.get(adjustedDistance);
+    calculatedRpm = adjustedParams.rpm * ShooterConstants.kRpmScaleFactor;
+  }
+
+  public double getCalculatedRpm() {
+    return calculatedRpm;
+  }
+
+  public void setIsShooting(boolean shooting) {
+    this.isShooting = shooting;
+  }
+
+  private Debouncer flywheelDebouncer =
+      new Debouncer(ShooterConstants.kFlywheelDebounceTimeSeconds, DebounceType.kFalling);
+
+  public boolean flywheelAtSetpoint() {
+    boolean atSetpoint =
+        Math.abs(flywheelEncoder.getVelocity() - flywheelTargetVelocity)
+            < 300; // Should eb in constants? maybe needs to be tuned.
+    return flywheelDebouncer.calculate(atSetpoint);
+  }
+
   /**
    * Command to run the flywheel motors. When the command is interrupted, e.g. the button is
    * released, the motors will stop.
@@ -124,7 +210,7 @@ public class Shooter extends SubsystemBase {
   public Command runFlywheelCommand() {
     return this.startEnd(
             () -> {
-              this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+              this.setFlywheelVelocity(calculatedRpm);
             },
             () -> {
               this.setFlywheelVelocity(0.0);
@@ -139,7 +225,7 @@ public class Shooter extends SubsystemBase {
   public Command runFeederCommand() {
     return this.startEnd(
             () -> {
-              this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+              this.setFlywheelVelocity(calculatedRpm);
               this.setFeederPower(FeederSetpoints.kFeed);
             },
             () -> {
@@ -155,14 +241,14 @@ public class Shooter extends SubsystemBase {
    */
   public Command runShooterCommand() {
     Command spinUntilUp =
-        this.startEnd(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm), () -> {})
+        this.startEnd(() -> this.setFlywheelVelocity(calculatedRpm), () -> {})
             .until(isFlywheelSpinning)
             .withName("SpinUntilUp");
 
     Command feederPhase =
         this.startEnd(
                 () -> {
-                  this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+                  this.setFlywheelVelocity(calculatedRpm);
                   this.setFeederPower(FeederSetpoints.kFeed);
                 },
                 () -> {
@@ -175,12 +261,12 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command runShooter() {
-    return this.runOnce(() -> this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm))
+    return this.runOnce(() -> this.setFlywheelVelocity(calculatedRpm))
         .until(isFlywheelSpinning)
         .andThen(
             this.runOnce(
                 () -> {
-                  this.setFlywheelVelocity(FlywheelSetpoints.kShootRpm);
+                  this.setFlywheelVelocity(calculatedRpm);
                   this.setFeederPower(FeederSetpoints.kFeed);
                 }));
   }
@@ -219,6 +305,7 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putBoolean("Is Flywheel Spinning", isFlywheelSpinning.getAsBoolean());
     SmartDashboard.putBoolean("Is Flywheel Stopped", isFlywheelStopped.getAsBoolean());
+    SmartDashboard.putNumber("Shooter | Calculated RPM", calculatedRpm);
   }
 
   @Override

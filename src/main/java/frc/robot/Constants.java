@@ -116,13 +116,13 @@ public final class Constants {
 
     public static final class RollerSetpoints {
       public static final double kIntake = 1;
-      public static final double kExtake = -0.75;
+      public static final double kExtake = -1;
       public static final double kStop = 0;
     }
 
     public static final class ConveyorSetpoints {
       public static final double kIntake = -1;
-      public static final double kExtake = 0.75;
+      public static final double kExtake = 1;
       public static final double kStop = 0;
     }
 
@@ -152,14 +152,17 @@ public final class Constants {
     public static final int kFeederMotorCanId = 5;
     public static final int kFlywheelMotorCanId = 6;
     public static final int kFlywheelFollowerMotorCanId = 7;
+    public static final double kFlywheelDebounceTimeSeconds = 0.1;
+    public static final double kLatencyCompensation = 0.1; // seconds
+    public static final double kRpmScaleFactor = 0.9; // Scale all lookup RPMs down (tune this)
 
     public static final class FeederSetpoints {
       public static final double kFeed = 0.95;
     }
 
     public static final class FlywheelSetpoints {
-      public static final double kShootRpm = 2200;
-      public static final double kVelocityTolerance = 100;
+      public static final double kShootRpm = 2200; // fallback default
+      public static final double kVelocityTolerance = 300;
     }
   }
 }

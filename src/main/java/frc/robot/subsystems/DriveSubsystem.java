@@ -72,6 +72,7 @@ public class DriveSubsystem extends SubsystemBase {
   private boolean aligning = false;
   private boolean shooting = false;
   private double alignRotSpeed = 0.0;
+  private double targetHeadingDeg = 0.0;
   private final PIDController alignPID =
       new PIDController(AutoAlignConstants.kP, AutoAlignConstants.kI, AutoAlignConstants.kD);
 
@@ -189,18 +190,21 @@ public class DriveSubsystem extends SubsystemBase {
 
     m_field2d.setRobotPose(getPose());
 
-    if ((aligning || shooting) && LimelightHelpers.getTV(LimelightConstants.kFrontName)) {
-      double tx = LimelightHelpers.getTX(LimelightConstants.kFrontName);
-      alignRotSpeed = alignPID.calculate(tx, 0);
+    if (aligning || shooting) {
+      double currentHeading = getPose().getRotation().getDegrees();
+      double headingError = targetHeadingDeg - currentHeading;
+      // Normalize to [-180, 180]
+      headingError = ((headingError + 180) % 360 + 360) % 360 - 180;
+      alignRotSpeed = alignPID.calculate(-headingError, 0);
     } else {
       alignRotSpeed = 0.0;
     }
 
     SmartDashboard.putBoolean("AutoAlign/Aligning", aligning);
     SmartDashboard.putBoolean("AutoAlign/Aligned", isAligned());
-    SmartDashboard.putNumber("AutoAlign/TX", LimelightHelpers.getTX(LimelightConstants.kFrontName));
-    SmartDashboard.putBoolean(
-        "AutoAlign/HasTarget", LimelightHelpers.getTV(LimelightConstants.kFrontName));
+    SmartDashboard.putNumber("AutoAlign/TargetHeading", targetHeadingDeg);
+    SmartDashboard.putNumber(
+        "AutoAlign/HeadingError", targetHeadingDeg - getPose().getRotation().getDegrees());
   }
 
   /**
@@ -302,10 +306,14 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+  public void setTargetHeading(double headingDeg) {
+    this.targetHeadingDeg = headingDeg;
+  }
+
   public boolean isAligned() {
-    if (!LimelightHelpers.getTV(LimelightConstants.kFrontName)) return true;
-    double tx = LimelightHelpers.getTX(LimelightConstants.kFrontName);
-    return Math.abs(tx) <= AutoAlignConstants.kAlignTolerance;
+    double headingError = targetHeadingDeg - getPose().getRotation().getDegrees();
+    headingError = ((headingError + 180) % 360 + 360) % 360 - 180;
+    return Math.abs(headingError) <= AutoAlignConstants.kAlignTolerance;
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
