@@ -43,13 +43,14 @@ public class Superstructure extends SubsystemBase {
 
   public Command passingSequence() {
     return new ParallelCommandGroup(
-            m_shooter.runShooterCommand(),
+            m_shooter.runPassCommand(),
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> m_shooter.isFlywheelSpinning.getAsBoolean()),
-                m_intake.conveyorCommand()))
+                new ParallelCommandGroup(m_intake.conveyorCommand(), m_intake.agitateCommand())))
         .finallyDo(
             () -> {
               m_shooter.stopAll();
+              m_intake.stopAll();
             });
   }
 

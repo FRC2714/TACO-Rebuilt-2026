@@ -138,14 +138,14 @@ public class Shooter extends SubsystemBase {
   static {
     // TODO: Tune these values on the actual robot
     shooterMap.put(1.626, new ShooterParams(1850, 0.89));
-    shooterMap.put(2.68, new ShooterParams(2200, 1.09));
-    shooterMap.put(2.9464, new ShooterParams(2500, 1.27));
-    shooterMap.put(3.17, new ShooterParams(2400, 1.2));
+    shooterMap.put(2.68, new ShooterParams(2325, 1.09));
+    shooterMap.put(2.9464, new ShooterParams(2400, 1.27));
+    shooterMap.put(3.17, new ShooterParams(2500, 1.2));
     shooterMap.put(3.4, new ShooterParams(2600, 1.2));
-    shooterMap.put(4.2, new ShooterParams(3200, 1.3));
-    shooterMap.put(4.5, new ShooterParams(3900, 1.3));
-    shooterMap.put(4.65, new ShooterParams(3800, 1.4));
-    shooterMap.put(5.2, new ShooterParams(3900, 1.4));
+    shooterMap.put(4.2, new ShooterParams(2900, 1.3));
+    shooterMap.put(4.5, new ShooterParams(3000, 1.3));
+    shooterMap.put(4.65, new ShooterParams(3150, 1.4));
+    shooterMap.put(5.2, new ShooterParams(3500, 1.4));
   }
 
   public void calculate(
@@ -266,6 +266,28 @@ public class Shooter extends SubsystemBase {
         this.run(
                 () -> {
                   this.setFlywheelVelocity(calculatedRpm);
+                  this.setFeederPower(FeederSetpoints.kFeed);
+                })
+            .finallyDo(
+                () -> {
+                  this.setFlywheelVelocity(0.0);
+                  this.setFeederPower(0.0);
+                })
+            .withName("FeederPhase");
+
+    return spinUntilUp.andThen(feederPhase).withName("Shooting");
+  }
+
+  public Command runPassCommand() {
+    Command spinUntilUp =
+        this.run(() -> this.setFlywheelVelocity(ShooterConstants.FlywheelSetpoints.kPassRpm))
+            .until(isFlywheelSpinning)
+            .withName("SpinUntilUp");
+
+    Command feederPhase =
+        this.run(
+                () -> {
+                  this.setFlywheelVelocity(ShooterConstants.FlywheelSetpoints.kPassRpm);
                   this.setFeederPower(FeederSetpoints.kFeed);
                 })
             .finallyDo(

@@ -171,6 +171,7 @@ public final class Constants {
 
     public static final class FlywheelSetpoints {
       public static final double kShootRpm = 2200; // fallback default
+      public static final double kPassRpm = 3750; // fallback default
       public static final double kVelocityTolerance = 300;
     }
   }
