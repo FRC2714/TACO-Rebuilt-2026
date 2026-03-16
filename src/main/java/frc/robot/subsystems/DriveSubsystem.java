@@ -277,6 +277,18 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
+  /** Returns the robot's field-relative velocity from swerve module states. */
+  public Translation2d getFieldRelativeVelocity() {
+    ChassisSpeeds robotSpeeds =
+        DriveConstants.kDriveKinematics.toChassisSpeeds(
+            m_frontLeft.getState(),
+            m_frontRight.getState(),
+            m_rearLeft.getState(),
+            m_rearRight.getState());
+    return new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
+        .rotateBy(getPose().getRotation());
+  }
+
   /** Sets the wheels into an X formation to prevent movement. */
   public void setX() {
     m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));

@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkSim;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
@@ -133,15 +134,13 @@ public class Intake extends SubsystemBase {
         .withName("Intaking");
   }
 
-  public Command conveyorWithRollerCommand() {
+  public Command conveyorCommand() {
     return this.startEnd(
             () -> {
               setConveyorSpeed(ConveyorSetpoints.INTAKE);
-              setRollerSpeed(RollerSetpoints.INTAKE);
             },
             () -> {
               m_conveyor.stopMotor();
-              m_roller.stopMotor();
             })
         .withName("Conveyoring");
   }
@@ -157,6 +156,34 @@ public class Intake extends SubsystemBase {
           setRollerSpeed(RollerSetpoints.STOP);
           setConveyorSpeed(ConveyorSetpoints.STOP);
         });
+  }
+
+  /** Pivot-only agitation: stow/deploy cycles to push balls in. Does not control rollers/conveyor. */
+  public Command agitateCommand() {
+    double stowTime = Constants.Intake.AgitatorConstants.kStowDuration;
+    double deployTime = Constants.Intake.AgitatorConstants.kDeployDuration;
+    int count = Constants.Intake.AgitatorConstants.kAgitationCount;
+
+    // Use Commands.runOnce (no subsystem requirement) so this can run parallel with conveyor
+    Command agitation = Commands.none();
+    for (int i = 0; i < count; i++) {
+      agitation = agitation
+          .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.STOW)))
+          .andThen(Commands.runOnce(() -> setRollerSpeed(RollerSetpoints.INTAKE)))
+          .andThen(Commands.waitSeconds(stowTime))
+          .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.INTAKE)))
+          .andThen(Commands.waitSeconds(deployTime));
+    }
+
+    return Commands.waitSeconds(Constants.Intake.AgitatorConstants.kDelayBeforeAgitating)
+        .andThen(agitation)
+        .withName("Agitating");
+  }
+
+  public void stopAll() {
+    setPivot(PivotSetpoints.STOW);
+    setRollerSpeed(RollerSetpoints.STOP);
+    setConveyorSpeed(ConveyorSetpoints.STOP);
   }
 
   public Command stowCommand() {
