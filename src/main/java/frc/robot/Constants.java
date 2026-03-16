@@ -132,6 +132,13 @@ public final class Constants {
       public static final double kIntake = 0.3;
       public static final double kExtake = 0.3;
     }
+
+    public static final class AgitatorConstants {
+      public static final double kDelayBeforeAgitating = 1.5; // seconds after flywheel spins up
+      public static final int kAgitationCount = 1; // number of stow/deploy cycles
+      public static final double kStowDuration = 0.75; // seconds to hold stow
+      public static final double kDeployDuration = 0.75; // seconds to hold deploy
+    }
   }
 
   public static final class LimelightConstants {
@@ -155,6 +162,8 @@ public final class Constants {
     public static final double kFlywheelDebounceTimeSeconds = 0.1;
     public static final double kLatencyCompensation = 0.1; // seconds
     public static final double kRpmScaleFactor = 0.9; // Scale all lookup RPMs down (tune this)
+    public static final double kRpmPerMpsRadial = 100.0; // RPM per m/s moving away from hub (tune)
+    public static final double kRpmPerMpsLateral = 75.0; // RPM per m/s moving sideways (tune)
 
     public static final class FeederSetpoints {
       public static final double kFeed = 0.95;

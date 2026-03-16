@@ -57,6 +57,7 @@ public class Shooter extends SubsystemBase {
   // Member variables for subsystem state management
   private double flywheelTargetVelocity = 0.0;
   private double calculatedRpm = FlywheelSetpoints.kShootRpm;
+  private double calculatedHeadingDeg = 0.0;
   private boolean isShooting = false;
 
   /** Creates a new ShooterSubsystem. */
@@ -138,11 +139,13 @@ public class Shooter extends SubsystemBase {
     // TODO: Tune these values on the actual robot
     shooterMap.put(1.626, new ShooterParams(1850, 0.89));
     shooterMap.put(2.68, new ShooterParams(2200, 1.09));
-    shooterMap.put(2.9464, new ShooterParams(2300, 1.27));
-    shooterMap.put(3.17, new ShooterParams(2300, 1.2));
-    shooterMap.put(4.2, new ShooterParams(3000, 1.3));
-    shooterMap.put(4.5, new ShooterParams(3700, 1.3));
-    shooterMap.put(4.65, new ShooterParams(4000, 1.4));
+    shooterMap.put(2.9464, new ShooterParams(2500, 1.27));
+    shooterMap.put(3.17, new ShooterParams(2400, 1.2));
+    shooterMap.put(3.4, new ShooterParams(2600, 1.2));
+    shooterMap.put(4.2, new ShooterParams(3200, 1.3));
+    shooterMap.put(4.5, new ShooterParams(3900, 1.3));
+    shooterMap.put(4.65, new ShooterParams(3800, 1.4));
+    shooterMap.put(5.2, new ShooterParams(3900, 1.4));
   }
 
   public void calculate(
@@ -184,11 +187,26 @@ public class Shooter extends SubsystemBase {
 
     double adjustedDistance = adjustedRelativePosition.getNorm();
     ShooterParams adjustedParams = shooterMap.get(adjustedDistance);
-    calculatedRpm = adjustedParams.rpm * ShooterConstants.kRpmScaleFactor;
+    // Project robot velocity onto the away-from-hub direction
+    // Positive = moving away (needs more RPM), negative = moving toward (needs less)
+    Translation2d awayFromHub = relativePosition.div(relativePosition.getNorm()).times(-1);
+    double radialSpeed = robotVelocity.getX() * awayFromHub.getX()
+        + robotVelocity.getY() * awayFromHub.getY();
+    double lateralSpeed = Math.abs(robotVelocity.getNorm() * robotVelocity.getNorm()
+        - radialSpeed * radialSpeed);
+    lateralSpeed = Math.sqrt(Math.max(0, lateralSpeed));
+    double velocityRpmBoost = radialSpeed * ShooterConstants.kRpmPerMpsRadial
+        + lateralSpeed * ShooterConstants.kRpmPerMpsLateral;
+    calculatedRpm = (adjustedParams.rpm + velocityRpmBoost) * ShooterConstants.kRpmScaleFactor;
+    calculatedHeadingDeg = adjustedRelativePosition.getAngle().getDegrees();
   }
 
   public double getCalculatedRpm() {
     return calculatedRpm;
+  }
+
+  public double getCalculatedHeadingDeg() {
+    return calculatedHeadingDeg;
   }
 
   public void setIsShooting(boolean shooting) {
@@ -210,13 +228,8 @@ public class Shooter extends SubsystemBase {
    * released, the motors will stop.
    */
   public Command runFlywheelCommand() {
-    return this.startEnd(
-            () -> {
-              this.setFlywheelVelocity(calculatedRpm);
-            },
-            () -> {
-              this.setFlywheelVelocity(0.0);
-            })
+    return this.run(() -> this.setFlywheelVelocity(calculatedRpm))
+        .finallyDo(() -> this.setFlywheelVelocity(0.0))
         .withName("Spinning Up Flywheel");
   }
 
@@ -225,12 +238,11 @@ public class Shooter extends SubsystemBase {
    * is released, the motors will stop.
    */
   public Command runFeederCommand() {
-    return this.startEnd(
-            () -> {
+    return this.run(() -> {
               this.setFlywheelVelocity(calculatedRpm);
               this.setFeederPower(FeederSetpoints.kFeed);
-            },
-            () -> {
+            })
+        .finallyDo(() -> {
               this.setFlywheelVelocity(0.0);
               this.setFeederPower(0.0);
             })
@@ -243,17 +255,16 @@ public class Shooter extends SubsystemBase {
    */
   public Command runShooterCommand() {
     Command spinUntilUp =
-        this.startEnd(() -> this.setFlywheelVelocity(calculatedRpm), () -> {})
+        this.run(() -> this.setFlywheelVelocity(calculatedRpm))
             .until(isFlywheelSpinning)
             .withName("SpinUntilUp");
 
     Command feederPhase =
-        this.startEnd(
-                () -> {
+        this.run(() -> {
                   this.setFlywheelVelocity(calculatedRpm);
                   this.setFeederPower(FeederSetpoints.kFeed);
-                },
-                () -> {
+                })
+            .finallyDo(() -> {
                   this.setFlywheelVelocity(0.0);
                   this.setFeederPower(0.0);
                 })
@@ -263,10 +274,10 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command runShooter() {
-    return this.runOnce(() -> this.setFlywheelVelocity(calculatedRpm))
+    return this.run(() -> this.setFlywheelVelocity(calculatedRpm))
         .until(isFlywheelSpinning)
         .andThen(
-            this.runOnce(
+            this.run(
                 () -> {
                   this.setFlywheelVelocity(calculatedRpm);
                   this.setFeederPower(FeederSetpoints.kFeed);
