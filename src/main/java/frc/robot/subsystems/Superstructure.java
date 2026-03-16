@@ -76,6 +76,8 @@ public class Superstructure extends SubsystemBase {
         goalPosition,
         ShooterConstants.kLatencyCompensation);
 
-    m_driveSubsystem.setTargetHeading(m_shooter.getCalculatedHeadingDeg());
+    m_driveSubsystem.setTargetHeading(
+        m_shooter.getCalculatedHeadingDeg()
+            + frc.robot.Constants.AutoAlignConstants.kRotationOffsetDeg);
   }
 }

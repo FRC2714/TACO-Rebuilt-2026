@@ -19,18 +19,6 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start Intake NZ"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "INTAKE"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "Intake NZ"
           }
         },

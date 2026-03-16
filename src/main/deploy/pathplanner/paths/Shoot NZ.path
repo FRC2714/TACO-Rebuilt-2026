@@ -3,16 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.7454698795180725,
-        "y": 5.503537803138374
+        "x": 7.713637660485022,
+        "y": 5.516476462196862
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.002614457831324,
-        "y": 5.357253012048193
+        "x": 5.106497860199714,
+        "y": 5.3353352353780314
       },
       "isLocked": false,
-      "linkedName": "intake-nz"
+      "linkedName": "D-intake-NZ"
+    },
+    {
+      "anchor": {
+        "x": 4.992514899111423,
+        "y": 5.441332861402815
+      },
+      "prevControl": {
+        "x": 5.2422688294729864,
+        "y": 5.430243485002358
+      },
+      "nextControl": {
+        "x": 4.7427609687498595,
+        "y": 5.452422237803272
+      },
+      "isLocked": false,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -28,10 +44,27 @@
       "linkedName": "score-position"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 90.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "AGITATE",
+      "waypointRelativePos": 1.6,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "AGITATE"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -48,7 +81,7 @@
   "folder": "Depot Preload to NZ",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

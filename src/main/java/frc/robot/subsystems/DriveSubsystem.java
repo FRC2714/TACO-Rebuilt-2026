@@ -362,7 +362,6 @@ public class DriveSubsystem extends SubsystemBase {
         },
         pose);
 
-    // Seed orientation, then switch to fused IMU mode after a brief delay
     LimelightHelpers.SetRobotOrientation(LimelightConstants.kFrontName, 0, 0, 0, 0, 0, 0);
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 1);
     LimelightHelpers.SetRobotOrientation(LimelightConstants.kBackName, 0, 0, 0, 0, 0, 0);

@@ -137,7 +137,7 @@ public final class Constants {
     public static final class AgitatorConstants {
       public static final double kDelayBeforeAgitating = 1.25; // seconds after flywheel spins up
       public static final int kAgitationCount = 1; // number of stow/deploy cycles
-      public static final double kStowDuration = 0.75; // seconds to hold stow
+      public static final double kStowDuration = 1.2; // seconds to hold stow
       public static final double kDeployDuration = 0.75; // seconds to hold deploy
     }
   }
@@ -153,7 +153,8 @@ public final class Constants {
     public static final double kP = 0.08;
     public static final double kI = 0;
     public static final double kD = 0.005;
-    public static final double kAlignTolerance = 1.0; // degrees of tx error
+    public static final double kAlignTolerance = 0.3; // degrees of tx error
+    public static final double kRotationOffsetDeg = 0.0; // degrees to nudge aim (+ = left, - = right)
   }
 
   public static final class ShooterConstants {

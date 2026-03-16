@@ -158,10 +158,9 @@ public class Intake extends SubsystemBase {
         });
   }
 
-  /** Single agitation cycle: stow with rollers intaking, then deploy. */
+  /** Single agitation cycle: stow with rollers intaking. No deploy — just one push. */
   public Command agitateCommand() {
     double stowTime = Constants.Intake.AgitatorConstants.kStowDuration;
-    double deployTime = Constants.Intake.AgitatorConstants.kDeployDuration;
 
     return this.runOnce(
             () -> {
@@ -169,13 +168,7 @@ public class Intake extends SubsystemBase {
               setRollerSpeed(RollerSetpoints.INTAKE);
             })
         .andThen(Commands.waitSeconds(stowTime))
-        .andThen(
-            this.runOnce(
-                () -> {
-                  setPivot(PivotSetpoints.AGITATE);
-                  setRollerSpeed(RollerSetpoints.STOP);
-                }))
-        .andThen(Commands.waitSeconds(deployTime))
+        .finallyDo(() -> setRollerSpeed(RollerSetpoints.STOP))
         .withName("Agitating");
   }
 

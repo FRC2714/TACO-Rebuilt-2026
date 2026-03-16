@@ -48,17 +48,12 @@ public class RobotContainer {
     NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence().withTimeout(4));
     NamedCommands.registerCommand(
         "INTAKE",
-        m_intake
-            .intakeCommand()
-            .alongWith(
-                m_shooter
-                    .runFeederOnlyCommand(Constants.ShooterConstants.FeederSetpoints.kFeed * 0.2)
-                    .withTimeout(1))
-            .withTimeout(2.5));
+        m_intake.intakeCommand().withTimeout(2.5));
     NamedCommands.registerCommand("WAIT", new WaitCommand(5));
     NamedCommands.registerCommand(
         "ZERO DRIVER HEADING", new InstantCommand(() -> m_robotDrive.zeroDriverHeading()));
     NamedCommands.registerCommand("FLIP POSE", new InstantCommand(() -> m_robotDrive.zeroPose()));
+    NamedCommands.registerCommand("AGITATE", m_intake.agitateCommand().withTimeout(1));
 
     // Configure the button bindings
     configureButtonBindings();
