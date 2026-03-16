@@ -158,7 +158,9 @@ public class Intake extends SubsystemBase {
         });
   }
 
-  /** Pivot-only agitation: stow/deploy cycles to push balls in. Does not control rollers/conveyor. */
+  /**
+   * Pivot-only agitation: stow/deploy cycles to push balls in. Does not control rollers/conveyor.
+   */
   public Command agitateCommand() {
     double stowTime = Constants.Intake.AgitatorConstants.kStowDuration;
     double deployTime = Constants.Intake.AgitatorConstants.kDeployDuration;
@@ -167,12 +169,13 @@ public class Intake extends SubsystemBase {
     // Use Commands.runOnce (no subsystem requirement) so this can run parallel with conveyor
     Command agitation = Commands.none();
     for (int i = 0; i < count; i++) {
-      agitation = agitation
-          .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.STOW)))
-          .andThen(Commands.runOnce(() -> setRollerSpeed(RollerSetpoints.INTAKE)))
-          .andThen(Commands.waitSeconds(stowTime))
-          .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.INTAKE)))
-          .andThen(Commands.waitSeconds(deployTime));
+      agitation =
+          agitation
+              .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.STOW)))
+              .andThen(Commands.runOnce(() -> setRollerSpeed(RollerSetpoints.INTAKE)))
+              .andThen(Commands.waitSeconds(stowTime))
+              .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.INTAKE)))
+              .andThen(Commands.waitSeconds(deployTime));
     }
 
     return Commands.waitSeconds(Constants.Intake.AgitatorConstants.kDelayBeforeAgitating)

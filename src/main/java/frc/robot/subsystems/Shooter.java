@@ -190,13 +190,14 @@ public class Shooter extends SubsystemBase {
     // Project robot velocity onto the away-from-hub direction
     // Positive = moving away (needs more RPM), negative = moving toward (needs less)
     Translation2d awayFromHub = relativePosition.div(relativePosition.getNorm()).times(-1);
-    double radialSpeed = robotVelocity.getX() * awayFromHub.getX()
-        + robotVelocity.getY() * awayFromHub.getY();
-    double lateralSpeed = Math.abs(robotVelocity.getNorm() * robotVelocity.getNorm()
-        - radialSpeed * radialSpeed);
+    double radialSpeed =
+        robotVelocity.getX() * awayFromHub.getX() + robotVelocity.getY() * awayFromHub.getY();
+    double lateralSpeed =
+        Math.abs(robotVelocity.getNorm() * robotVelocity.getNorm() - radialSpeed * radialSpeed);
     lateralSpeed = Math.sqrt(Math.max(0, lateralSpeed));
-    double velocityRpmBoost = radialSpeed * ShooterConstants.kRpmPerMpsRadial
-        + lateralSpeed * ShooterConstants.kRpmPerMpsLateral;
+    double velocityRpmBoost =
+        radialSpeed * ShooterConstants.kRpmPerMpsRadial
+            + lateralSpeed * ShooterConstants.kRpmPerMpsLateral;
     calculatedRpm = (adjustedParams.rpm + velocityRpmBoost) * ShooterConstants.kRpmScaleFactor;
     calculatedHeadingDeg = adjustedRelativePosition.getAngle().getDegrees();
   }
@@ -238,11 +239,13 @@ public class Shooter extends SubsystemBase {
    * is released, the motors will stop.
    */
   public Command runFeederCommand() {
-    return this.run(() -> {
+    return this.run(
+            () -> {
               this.setFlywheelVelocity(calculatedRpm);
               this.setFeederPower(FeederSetpoints.kFeed);
             })
-        .finallyDo(() -> {
+        .finallyDo(
+            () -> {
               this.setFlywheelVelocity(0.0);
               this.setFeederPower(0.0);
             })
@@ -260,11 +263,13 @@ public class Shooter extends SubsystemBase {
             .withName("SpinUntilUp");
 
     Command feederPhase =
-        this.run(() -> {
+        this.run(
+                () -> {
                   this.setFlywheelVelocity(calculatedRpm);
                   this.setFeederPower(FeederSetpoints.kFeed);
                 })
-            .finallyDo(() -> {
+            .finallyDo(
+                () -> {
                   this.setFlywheelVelocity(0.0);
                   this.setFeederPower(0.0);
                 })
