@@ -1,9 +1,7 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkSim;
@@ -17,11 +15,6 @@ import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
   private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId, MotorType.kBrushless);
-
-  private AbsoluteEncoder m_pivotEncoder = m_pivot.getAbsoluteEncoder();
-
-  private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
-
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
   private SparkFlex m_conveyor =
       new SparkFlex(Constants.Intake.kConveyorCanId, MotorType.kBrushless);
@@ -34,7 +27,8 @@ public class Intake extends SubsystemBase {
   private enum PivotSetpoints {
     STOW,
     INTAKE,
-    EXTAKE
+    EXTAKE,
+    AGITATE
   }
 
   private enum RollerSetpoints {
@@ -50,7 +44,6 @@ public class Intake extends SubsystemBase {
   }
 
   public Intake() {
-    // Constructor code here
     m_pivot.configure(
         Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_roller.configure(
@@ -63,6 +56,7 @@ public class Intake extends SubsystemBase {
         PersistMode.kPersistParameters);
     DCMotor motorModel = DCMotor.getNEO(1);
     rollerSim = new SparkSim(m_roller, motorModel);
+    conveyorSim = new SparkSim(m_conveyor, motorModel);
   }
 
   private void setRollerSpeed(RollerSetpoints setpoint) {
@@ -113,11 +107,21 @@ public class Intake extends SubsystemBase {
       case EXTAKE:
         setSpeed = Constants.Intake.PivotSetpoints.kExtake;
         break;
+      case AGITATE:
+        setSpeed = Constants.Intake.PivotSetpoints.kAgitate;
+        break;
       default:
         return;
     }
     pivotSpeed = setSpeed;
     m_pivot.set(setSpeed);
+  }
+
+  /** Stow pivot and stop all motors. */
+  public void stopAll() {
+    setPivot(PivotSetpoints.STOW);
+    setRollerSpeed(RollerSetpoints.STOP);
+    setConveyorSpeed(ConveyorSetpoints.STOP);
   }
 
   public Command intakeCommand() {
@@ -128,104 +132,97 @@ public class Intake extends SubsystemBase {
               setConveyorSpeed(ConveyorSetpoints.INTAKE);
             },
             () -> {
-              m_roller.stopMotor();
-              m_conveyor.stopMotor();
+              setRollerSpeed(RollerSetpoints.STOP);
+              setConveyorSpeed(ConveyorSetpoints.STOP);
             })
         .withName("Intaking");
   }
 
   public Command conveyorCommand() {
     return this.startEnd(
-            () -> {
-              setConveyorSpeed(ConveyorSetpoints.INTAKE);
-            },
-            () -> {
-              m_conveyor.stopMotor();
-            })
+            () -> setConveyorSpeed(ConveyorSetpoints.INTAKE),
+            () -> setConveyorSpeed(ConveyorSetpoints.STOP))
         .withName("Conveyoring");
   }
 
   public Command extakeCommand() {
     return this.startEnd(
-        (() -> {
+        () -> {
           setPivot(PivotSetpoints.EXTAKE);
           setRollerSpeed(RollerSetpoints.EXTAKE);
           setConveyorSpeed(ConveyorSetpoints.EXTAKE);
-        }),
+        },
         () -> {
           setRollerSpeed(RollerSetpoints.STOP);
           setConveyorSpeed(ConveyorSetpoints.STOP);
         });
   }
 
-  /**
-   * Pivot-only agitation: stow/deploy cycles to push balls in. Does not control rollers/conveyor.
-   */
+  /** Single agitation cycle: stow with rollers intaking, then deploy. */
   public Command agitateCommand() {
+    double stowTime = Constants.Intake.AgitatorConstants.kStowDuration;
+    double deployTime = Constants.Intake.AgitatorConstants.kDeployDuration;
+
+    return this.runOnce(
+            () -> {
+              setPivot(PivotSetpoints.STOW);
+              setRollerSpeed(RollerSetpoints.INTAKE);
+            })
+        .andThen(Commands.waitSeconds(stowTime))
+        .andThen(
+            this.runOnce(
+                () -> {
+                  setPivot(PivotSetpoints.AGITATE);
+                  setRollerSpeed(RollerSetpoints.STOP);
+                }))
+        .andThen(Commands.waitSeconds(deployTime))
+        .withName("Agitating");
+  }
+
+  /** Pivot-only agitation for use during shooting. Does not claim Intake subsystem. */
+  public Command shootingAgitateCommand() {
     double stowTime = Constants.Intake.AgitatorConstants.kStowDuration;
     double deployTime = Constants.Intake.AgitatorConstants.kDeployDuration;
     int count = Constants.Intake.AgitatorConstants.kAgitationCount;
 
-    // Use Commands.runOnce (no subsystem requirement) so this can run parallel with conveyor
     Command agitation = Commands.none();
     for (int i = 0; i < count; i++) {
       agitation =
           agitation
               .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.STOW)))
-              .andThen(Commands.runOnce(() -> setRollerSpeed(RollerSetpoints.INTAKE)))
               .andThen(Commands.waitSeconds(stowTime))
-              .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.INTAKE)))
+              .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.AGITATE)))
               .andThen(Commands.waitSeconds(deployTime));
     }
 
     return Commands.waitSeconds(Constants.Intake.AgitatorConstants.kDelayBeforeAgitating)
         .andThen(agitation)
-        .withName("Agitating");
-  }
-
-  public void stopAll() {
-    setPivot(PivotSetpoints.STOW);
-    setRollerSpeed(RollerSetpoints.STOP);
-    setConveyorSpeed(ConveyorSetpoints.STOP);
+        .withName("ShootingAgitate");
   }
 
   public Command stowCommand() {
-    return this.run(
-        () -> {
-          setRollerSpeed(RollerSetpoints.STOP);
-          setPivot(PivotSetpoints.STOW);
-          setConveyorSpeed(ConveyorSetpoints.STOP);
-        });
+    return this.run(this::stopAll);
   }
-
-  // public boolean atSetpoint() {
-  // return Math.abs(m_pivotEncoder.getPosition() - pivotSetpoint)
-  // <= Constants.Intake.kPivotThreshold;
-  // }
 
   @Override
   public void periodic() {
-    // SmartDashboard.putNumber("Intake/Pivot/Position",
-    // m_pivotEncoder.getPosition());
     SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSpeed);
-    // SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
   }
 
   public void simulationPeriodic() {
-    // Example: simulate velocity based on applied output
     double rollerAppliedOutput = m_roller.getAppliedOutput();
     double conveyorAppliedOutput = m_conveyor.getAppliedOutput();
 
-    rollerSim.setVelocity(rollerAppliedOutput * 5000); // fake RPM model
+    rollerSim.setVelocity(rollerAppliedOutput * 5000);
     rollerSim.setBusVoltage(12.0);
     rollerSim.setMotorCurrent(Math.abs(rollerAppliedOutput) * 40);
 
-    conveyorSim.setVelocity(rollerAppliedOutput * 5000); // fake RPM model
+    conveyorSim.setVelocity(conveyorAppliedOutput * 5000);
     conveyorSim.setBusVoltage(12.0);
-    conveyorSim.setMotorCurrent(Math.abs(rollerAppliedOutput) * 40);
+    conveyorSim.setMotorCurrent(Math.abs(conveyorAppliedOutput) * 40);
 
-    SmartDashboard.putNumber("Simulated Roller Velocity: ", rollerSim.getVelocity());
-    SmartDashboard.putNumber("Simulated Roller Current: ", rollerSim.getMotorCurrent());
-    SmartDashboard.putNumber("Simulated Bus Voltage: ", rollerSim.getBusVoltage());
+    SmartDashboard.putNumber("Intake/Roller/Simulated Velocity", rollerSim.getVelocity());
+    SmartDashboard.putNumber("Intake/Roller/Simulated Current", rollerSim.getMotorCurrent());
+    SmartDashboard.putNumber("Intake/Simulated Bus Voltage", rollerSim.getBusVoltage());
   }
 }

@@ -131,10 +131,11 @@ public final class Constants {
       public static final double kStow = -0.3;
       public static final double kIntake = 0.3;
       public static final double kExtake = 0.3;
+      public static final double kAgitate = 0.14;
     }
 
     public static final class AgitatorConstants {
-      public static final double kDelayBeforeAgitating = 1.5; // seconds after flywheel spins up
+      public static final double kDelayBeforeAgitating = 1.25; // seconds after flywheel spins up
       public static final int kAgitationCount = 1; // number of stow/deploy cycles
       public static final double kStowDuration = 0.75; // seconds to hold stow
       public static final double kDeployDuration = 0.75; // seconds to hold deploy

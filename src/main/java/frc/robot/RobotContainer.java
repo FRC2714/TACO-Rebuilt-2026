@@ -45,7 +45,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence().withTimeout(5));
+    NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence().withTimeout(4));
     NamedCommands.registerCommand(
         "INTAKE",
         m_intake
@@ -53,8 +53,8 @@ public class RobotContainer {
             .alongWith(
                 m_shooter
                     .runFeederOnlyCommand(Constants.ShooterConstants.FeederSetpoints.kFeed * 0.2)
-                    .withTimeout(2))
-            .withTimeout(5));
+                    .withTimeout(1))
+            .withTimeout(2.5));
     NamedCommands.registerCommand("WAIT", new WaitCommand(5));
     NamedCommands.registerCommand(
         "ZERO DRIVER HEADING", new InstantCommand(() -> m_robotDrive.zeroDriverHeading()));
@@ -99,9 +99,10 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
 
     // Intake Commands
-    m_driverController.x().onTrue(m_intake.stowCommand());
+    m_driverController.x().onTrue(m_superstructure.stowCommand());
     m_driverController.leftTrigger().whileTrue(m_intake.intakeCommand());
     m_driverController.povDown().whileTrue(m_intake.extakeCommand());
+    m_driverController.leftBumper().onTrue(m_intake.agitateCommand());
 
     // Shoot Commands
     m_driverController.rightTrigger().whileTrue(m_superstructure.shooterSequence());

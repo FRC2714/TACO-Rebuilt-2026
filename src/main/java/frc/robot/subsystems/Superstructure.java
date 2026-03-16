@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,19 +27,27 @@ public class Superstructure extends SubsystemBase {
     m_shooter = shooter;
   }
 
+  /** Stow everything: stop shooter, stop intake, stop aligning. */
+  private void stowAll() {
+    m_shooter.stopAll();
+    m_intake.stopAll();
+    m_driveSubsystem.setAligning(false);
+    m_driveSubsystem.setShooting(false);
+  }
+
+  public Command stowCommand() {
+    return Commands.runOnce(this::stowAll).withName("StowAll");
+  }
+
   public Command shooterSequence() {
     return new ParallelCommandGroup(
             m_shooter.runShooterCommand(),
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> m_shooter.isFlywheelSpinning.getAsBoolean()),
-                new ParallelCommandGroup(m_intake.conveyorCommand(), m_intake.agitateCommand())))
+                new ParallelCommandGroup(
+                    m_intake.conveyorCommand(), m_intake.shootingAgitateCommand())))
         .beforeStarting(() -> m_driveSubsystem.setAligning(true))
-        .finallyDo(
-            () -> {
-              m_driveSubsystem.setAligning(false);
-              m_shooter.stopAll();
-              m_intake.stopAll();
-            });
+        .finallyDo(interrupted -> stowAll());
   }
 
   public Command passingSequence() {
@@ -46,12 +55,9 @@ public class Superstructure extends SubsystemBase {
             m_shooter.runPassCommand(),
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> m_shooter.isFlywheelSpinning.getAsBoolean()),
-                new ParallelCommandGroup(m_intake.conveyorCommand(), m_intake.agitateCommand())))
-        .finallyDo(
-            () -> {
-              m_shooter.stopAll();
-              m_intake.stopAll();
-            });
+                new ParallelCommandGroup(
+                    m_intake.conveyorCommand(), m_intake.shootingAgitateCommand())))
+        .finallyDo(interrupted -> stowAll());
   }
 
   @Override
@@ -70,7 +76,6 @@ public class Superstructure extends SubsystemBase {
         goalPosition,
         ShooterConstants.kLatencyCompensation);
 
-    // Use the velocity-compensated heading from calculate() so the robot leads the shot
     m_driveSubsystem.setTargetHeading(m_shooter.getCalculatedHeadingDeg());
   }
 }

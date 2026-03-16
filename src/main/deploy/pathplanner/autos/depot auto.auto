@@ -23,12 +23,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "INTAKE"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Score depot"
