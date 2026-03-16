@@ -46,9 +46,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence().withTimeout(4));
-    NamedCommands.registerCommand(
-        "INTAKE",
-        m_intake.intakeCommand().withTimeout(2.5));
+    NamedCommands.registerCommand("INTAKE", m_intake.intakeCommand().withTimeout(2.5));
     NamedCommands.registerCommand("WAIT", new WaitCommand(5));
     NamedCommands.registerCommand(
         "ZERO DRIVER HEADING", new InstantCommand(() -> m_robotDrive.zeroDriverHeading()));

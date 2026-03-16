@@ -154,7 +154,33 @@ public final class Constants {
     public static final double kI = 0;
     public static final double kD = 0.005;
     public static final double kAlignTolerance = 0.3; // degrees of tx error
-    public static final double kRotationOffsetDeg = 0.0; // degrees to nudge aim (+ = left, - = right)
+    public static final double kRotationOffsetDeg =
+        0.0; // degrees to nudge aim (+ = left, - = right)
+  }
+
+  public static final class AutoAimConstants {
+    // Passing targets: aimed at the starting line, offset into the trench openings
+    public static final Translation2d kBlueLeftTarget =
+        new Translation2d(
+            frc.robot.FieldConstants.LinesVertical.starting,
+            frc.robot.FieldConstants.LinesHorizontal.leftTrenchOpenEnd - 0.6);
+
+    public static final Translation2d kBlueRightTarget =
+        new Translation2d(
+            frc.robot.FieldConstants.LinesVertical.starting,
+            frc.robot.FieldConstants.LinesHorizontal.rightTrenchOpenStart + 0.6);
+
+    public static final Translation2d kRedLeftTarget =
+        new Translation2d(
+            frc.robot.FieldConstants.fieldLength - frc.robot.FieldConstants.LinesVertical.starting,
+            frc.robot.FieldConstants.fieldWidth
+                - (frc.robot.FieldConstants.LinesHorizontal.leftTrenchOpenEnd - 0.6));
+
+    public static final Translation2d kRedRightTarget =
+        new Translation2d(
+            frc.robot.FieldConstants.fieldLength - frc.robot.FieldConstants.LinesVertical.starting,
+            frc.robot.FieldConstants.fieldWidth
+                - (frc.robot.FieldConstants.LinesHorizontal.rightTrenchOpenStart + 0.6));
   }
 
   public static final class ShooterConstants {

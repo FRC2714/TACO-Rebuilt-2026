@@ -311,6 +311,19 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(desiredStates[3]);
   }
 
+  /** Returns true if the robot is within its own alliance zone (behind the starting line). */
+  public boolean isInAllianceZone() {
+    double x = getPose().getTranslation().getX();
+    boolean isRed =
+        DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+            == DriverStation.Alliance.Red;
+    if (isRed) {
+      return x > frc.robot.FieldConstants.LinesVertical.oppAllianceZone;
+    } else {
+      return x < frc.robot.FieldConstants.LinesVertical.allianceZone;
+    }
+  }
+
   public void setAligning(boolean aligning) {
     this.aligning = aligning;
     if (!aligning) {

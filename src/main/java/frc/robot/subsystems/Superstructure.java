@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants.AutoAimConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Field;
+import frc.robot.FieldConstants;
 
 public class Superstructure extends SubsystemBase {
   private DriveSubsystem m_driveSubsystem;
@@ -60,20 +62,39 @@ public class Superstructure extends SubsystemBase {
         .finallyDo(interrupted -> stowAll());
   }
 
+  /** Select the appropriate passing target based on which side of the hub the robot is on. */
+  private Translation2d getPassingTarget() {
+    double robotY = m_driveSubsystem.getPose().getY();
+    double centerY = FieldConstants.LinesHorizontal.center;
+
+    if (Field.isRed()) {
+      return robotY < centerY ? AutoAimConstants.kRedLeftTarget : AutoAimConstants.kRedRightTarget;
+    } else {
+      return robotY < centerY
+          ? AutoAimConstants.kBlueRightTarget
+          : AutoAimConstants.kBlueLeftTarget;
+    }
+  }
+
   @Override
   public void periodic() {
     Pose2d pose = m_driveSubsystem.getPose();
     Translation2d robotPosition = pose.getTranslation();
-    Translation2d goalPosition = Field.getAllianceHub().toTranslation2d();
+    boolean inAllianceZone = m_driveSubsystem.isInAllianceZone();
 
-    double distanceToHub = robotPosition.getDistance(goalPosition);
-    SmartDashboard.putNumber("Distance to Hub", distanceToHub);
+    // In alliance zone: aim at hub. Outside: aim at passing target.
+    Translation2d target =
+        inAllianceZone ? Field.getAllianceHub().toTranslation2d() : getPassingTarget();
+
+    double distanceToTarget = robotPosition.getDistance(target);
+    SmartDashboard.putNumber("Distance to Hub", distanceToTarget);
+    SmartDashboard.putBoolean("In Alliance Zone", inAllianceZone);
 
     m_shooter.calculate(
         robotPosition,
         pose.getRotation(),
         m_driveSubsystem.getFieldRelativeVelocity(),
-        goalPosition,
+        target,
         ShooterConstants.kLatencyCompensation);
 
     m_driveSubsystem.setTargetHeading(
