@@ -31,12 +31,15 @@ public class Superstructure extends SubsystemBase {
             m_shooter.runShooterCommand(),
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> m_shooter.isFlywheelSpinning.getAsBoolean()),
-                m_intake.conveyorWithRollerCommand()))
+                new ParallelCommandGroup(
+                    m_intake.conveyorCommand(),
+                    m_intake.agitateCommand())))
         .beforeStarting(() -> m_driveSubsystem.setAligning(true))
         .finallyDo(
             () -> {
               m_driveSubsystem.setAligning(false);
               m_shooter.stopAll();
+              m_intake.stopAll();
             });
   }
 
@@ -45,7 +48,7 @@ public class Superstructure extends SubsystemBase {
             m_shooter.runShooterCommand(),
             new SequentialCommandGroup(
                 new WaitUntilCommand(() -> m_shooter.isFlywheelSpinning.getAsBoolean()),
-                m_intake.conveyorWithRollerCommand()))
+                m_intake.conveyorCommand()))
         .finallyDo(
             () -> {
               m_shooter.stopAll();
@@ -61,16 +64,14 @@ public class Superstructure extends SubsystemBase {
     double distanceToHub = robotPosition.getDistance(goalPosition);
     SmartDashboard.putNumber("Distance to Hub", distanceToHub);
 
-    // Continuously compute the heading angle to the hub
-    Translation2d robotToGoal = goalPosition.minus(robotPosition);
-    double angleToHub = Math.toDegrees(Math.atan2(robotToGoal.getY(), robotToGoal.getX()));
-    m_driveSubsystem.setTargetHeading(angleToHub);
-
     m_shooter.calculate(
         robotPosition,
         pose.getRotation(),
-        new Translation2d(),
+        m_driveSubsystem.getFieldRelativeVelocity(),
         goalPosition,
         ShooterConstants.kLatencyCompensation);
+
+    // Use the velocity-compensated heading from calculate() so the robot leads the shot
+    m_driveSubsystem.setTargetHeading(m_shooter.getCalculatedHeadingDeg());
   }
 }
