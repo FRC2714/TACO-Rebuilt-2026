@@ -6,9 +6,13 @@
     "Depot",
     "Depot Preload to NZ",
     "Outpost",
+    "Outpost Preload to NZ",
     "Shoot Preload"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Neutral Zone",
+    "Shoot Preload"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,

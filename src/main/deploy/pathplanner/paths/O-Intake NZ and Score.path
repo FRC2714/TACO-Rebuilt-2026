@@ -4,44 +4,44 @@
     {
       "anchor": {
         "x": 3.0233737517831663,
-        "y": 5.775249643366619
+        "y": 2.294750356633381
       },
       "prevControl": null,
       "nextControl": {
         "x": 5.233403413549551,
-        "y": 5.543793158580364
+        "y": 2.526206841419636
       },
       "isLocked": false,
-      "linkedName": "score-position"
+      "linkedName": "O-score-position"
     },
     {
       "anchor": {
         "x": 4.893009985734665,
-        "y": 5.64586305278174
+        "y": 2.42413694721826
       },
       "prevControl": {
         "x": 4.352165663511936,
-        "y": 5.615954807193206
+        "y": 2.454045192806794
       },
       "nextControl": {
         "x": 5.319742427784296,
-        "y": 5.6694610053773475
+        "y": 2.4005389946226523
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.571312410841653,
-        "y": 7.340827389443652
+        "x": 7.189621968616262,
+        "y": 1.1690870185449365
       },
       "prevControl": {
-        "x": 6.963195435092723,
-        "y": 6.331611982881598
+        "x": 6.827339514978602,
+        "y": 2.320627674750358
       },
       "nextControl": {
-        "x": 8.18461647792746,
-        "y": 8.358651160352013
+        "x": 7.54624341991006,
+        "y": 0.03554026264678889
       },
       "isLocked": false,
       "linkedName": null
@@ -49,15 +49,15 @@
     {
       "anchor": {
         "x": 7.843024251069899,
-        "y": 3.769757489300999
+        "y": 4.300242510699001
       },
       "prevControl": {
         "x": 7.911457084305472,
-        "y": 4.087786645691011
+        "y": 3.982213354308989
       },
       "nextControl": {
         "x": 7.606543798388696,
-        "y": 2.6707575602751756
+        "y": 5.399242439724824
       },
       "isLocked": false,
       "linkedName": null
@@ -65,15 +65,15 @@
     {
       "anchor": {
         "x": 6.018673323823109,
-        "y": 3.627432239657632
+        "y": 4.442567760342368
       },
       "prevControl": {
         "x": 6.397225100964902,
-        "y": 2.851024381985773
+        "y": 5.218975618014227
       },
       "nextControl": {
         "x": 5.77025645296353,
-        "y": 4.136934036135501
+        "y": 3.933065963864499
       },
       "isLocked": false,
       "linkedName": null
@@ -81,15 +81,15 @@
     {
       "anchor": {
         "x": 5.876831325301204,
-        "y": 5.269831325301205
+        "y": 2.800168674698795
       },
       "prevControl": {
         "x": 6.070427960057061,
-        "y": 4.42962910128388
+        "y": 3.64037089871612
       },
       "nextControl": {
         "x": 5.741326379044395,
-        "y": 5.857917772949926
+        "y": 2.212082227050074
       },
       "isLocked": false,
       "linkedName": null
@@ -97,33 +97,33 @@
     {
       "anchor": {
         "x": 2.273,
-        "y": 5.827
+        "y": 2.243
       },
       "prevControl": {
         "x": 2.2344363424787628,
-        "y": 5.57999221810116
+        "y": 2.49000778189884
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "D-intake-NZ"
+      "linkedName": "O-intake-NZ"
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 1,
-      "rotationDegrees": -90.0
+      "rotationDegrees": 90.0
     },
     {
       "waypointRelativePos": 3,
-      "rotationDegrees": -116.56505117707825
+      "rotationDegrees": 100.8230112262071
     },
     {
       "waypointRelativePos": 4.0,
-      "rotationDegrees": 90.0
+      "rotationDegrees": -90.0
     },
     {
       "waypointRelativePos": 5.3327800829875525,
-      "rotationDegrees": 90.0
+      "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [
@@ -169,7 +169,7 @@
     },
     {
       "name": "INTAKE_NZ",
-      "waypointRelativePos": 1.2854107648725202,
+      "waypointRelativePos": 1.7555865921787785,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -177,6 +177,12 @@
           "name": "INTAKE_NZ"
         }
       }
+    },
+    {
+      "name": "AGITATE",
+      "waypointRelativePos": 5.088453747467871,
+      "endWaypointRelativePos": null,
+      "command": null
     },
     {
       "name": "PRESPIN",
@@ -200,13 +206,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -43.727
+    "rotation": 43.727
   },
   "reversed": false,
-  "folder": "Depot Preload to NZ",
+  "folder": "Outpost Preload to NZ",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -50.792796495032114
+    "rotation": 50.792796495032114
   },
   "useDefaultConstraints": true
 }

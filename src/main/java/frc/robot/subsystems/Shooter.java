@@ -170,9 +170,7 @@ public class Shooter extends SubsystemBase {
 
   /** Pre-spin the flywheel to calculatedRpm. Keeps running until interrupted by another command. */
   public Command preSpinCommand() {
-    return this.run(() -> this.setFlywheelVelocity(calculatedRpm))
-        .finallyDo(this::stopAll)
-        .withName("PreSpin");
+    return this.run(() -> this.setFlywheelVelocity(calculatedRpm)).withName("PreSpin");
   }
 
   /** Spin up flywheel, then run feeder once at speed. Uses calculatedRpm (updates every cycle). */

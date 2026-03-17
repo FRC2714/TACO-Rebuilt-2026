@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Shoot Preload NZ"
+            "pathName": "O-Shoot Preload NZ"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Intake NZ and Score"
+            "pathName": "O-Intake NZ and Score"
           }
         },
         {
@@ -38,6 +38,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Neutral Zone",
   "choreoAuto": false
 }

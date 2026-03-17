@@ -47,7 +47,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence(true).withTimeout(3.5));
     NamedCommands.registerCommand(
-        "SCORE_NO_AGITATE", m_superstructure.shooterSequence(false).withTimeout(4));
+        "SCORE_NO_AGITATE", m_superstructure.shooterSequence(false).withTimeout(2.55));
     NamedCommands.registerCommand(
         "SCORE_NZ", m_superstructure.shooterSequence(true, .5, 0.85, 0.5, 1).withTimeout(6.5));
     NamedCommands.registerCommand("INTAKE", m_intake.intakeCommand().withTimeout(2.5));
@@ -63,6 +63,8 @@ public class RobotContainer {
         m_shooter.preSpinCommand().alongWith(m_intake.halfStowWithRollersCommand()));
     NamedCommands.registerCommand(
         "SCORE_MOVING", m_superstructure.shooterSequence(true, false, .5, 2.5, 0.5, 1).withTimeout(4.5));
+    NamedCommands.registerCommand(
+        "SCORE_MOVING_NO_AGITATE", m_superstructure.shooterSequence(false, false).withTimeout(3));
 
     // Configure the button bindings
     configureButtonBindings();

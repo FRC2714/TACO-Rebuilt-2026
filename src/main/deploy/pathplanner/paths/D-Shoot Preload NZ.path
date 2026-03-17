@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "PRESPIN",
-      "waypointRelativePos": 0.013456090651557506,
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
