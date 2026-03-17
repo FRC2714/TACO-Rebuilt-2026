@@ -45,13 +45,24 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence().withTimeout(4));
+    NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence(true).withTimeout(3.5));
+    NamedCommands.registerCommand(
+        "SCORE_NO_AGITATE", m_superstructure.shooterSequence(false).withTimeout(4));
+    NamedCommands.registerCommand(
+        "SCORE_NZ", m_superstructure.shooterSequence(true, .5, 0.85, 0.5, 1).withTimeout(6.5));
     NamedCommands.registerCommand("INTAKE", m_intake.intakeCommand().withTimeout(2.5));
+    NamedCommands.registerCommand("INTAKE_NZ", m_intake.intakeCommand().withTimeout(6));
+    NamedCommands.registerCommand("DEPLOY_INTAKE", m_intake.deployIntake());
     NamedCommands.registerCommand("WAIT", new WaitCommand(5));
     NamedCommands.registerCommand(
         "ZERO DRIVER HEADING", new InstantCommand(() -> m_robotDrive.zeroDriverHeading()));
     NamedCommands.registerCommand("FLIP POSE", new InstantCommand(() -> m_robotDrive.zeroPose()));
     NamedCommands.registerCommand("AGITATE", m_intake.agitateCommand().withTimeout(1));
+    NamedCommands.registerCommand(
+        "PRESPIN",
+        m_shooter.preSpinCommand().alongWith(m_intake.halfStowWithRollersCommand()));
+    NamedCommands.registerCommand(
+        "SCORE_MOVING", m_superstructure.shooterSequence(true, false, .5, 2.5, 0.5, 1).withTimeout(4.5));
 
     // Configure the button bindings
     configureButtonBindings();

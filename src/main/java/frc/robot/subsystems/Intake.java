@@ -26,6 +26,7 @@ public class Intake extends SubsystemBase {
 
   private enum PivotSetpoints {
     STOW,
+    HALF_STOW,
     INTAKE,
     EXTAKE,
     AGITATE
@@ -101,6 +102,9 @@ public class Intake extends SubsystemBase {
       case STOW:
         setSpeed = Constants.Intake.PivotSetpoints.kStow;
         break;
+      case HALF_STOW:
+        setSpeed = Constants.Intake.PivotSetpoints.kHalfStow;
+        break;
       case INTAKE:
         setSpeed = Constants.Intake.PivotSetpoints.kIntake;
         break;
@@ -138,11 +142,40 @@ public class Intake extends SubsystemBase {
         .withName("Intaking");
   }
 
+  public Command deployIntake() {
+    return this.runOnce(
+      () -> {
+        setPivot(PivotSetpoints.INTAKE);
+      }
+    );
+  }
+
   public Command conveyorCommand() {
     return this.startEnd(
             () -> setConveyorSpeed(ConveyorSetpoints.INTAKE),
             () -> setConveyorSpeed(ConveyorSetpoints.STOP))
         .withName("Conveyoring");
+  }
+
+  /** Half-stow pivot with rollers running. No subsystem claim. For use during prespin/shooting. */
+  public Command halfStowWithRollersCommand() {
+    return Commands.startEnd(
+            () -> {
+              setPivot(PivotSetpoints.HALF_STOW);
+              setRollerSpeed(RollerSetpoints.INTAKE);
+            },
+            () -> {
+              setRollerSpeed(RollerSetpoints.STOP);
+            })
+        .withName("HalfStowWithRollers");
+  }
+
+  /** Runs intake rollers without claiming Intake subsystem. For use in parallel with conveyor. */
+  public Command shootingRollerCommand() {
+    return Commands.startEnd(
+            () -> setRollerSpeed(RollerSetpoints.INTAKE),
+            () -> setRollerSpeed(RollerSetpoints.STOP))
+        .withName("ShootingRollers");
   }
 
   public Command extakeCommand() {
@@ -174,10 +207,15 @@ public class Intake extends SubsystemBase {
 
   /** Pivot-only agitation for use during shooting. Does not claim Intake subsystem. */
   public Command shootingAgitateCommand() {
-    double stowTime = Constants.Intake.AgitatorConstants.kStowDuration;
-    double deployTime = Constants.Intake.AgitatorConstants.kDeployDuration;
-    int count = Constants.Intake.AgitatorConstants.kAgitationCount;
+    return shootingAgitateCommand(
+        Constants.Intake.AgitatorConstants.kDelayBeforeAgitating,
+        Constants.Intake.AgitatorConstants.kStowDuration,
+        Constants.Intake.AgitatorConstants.kDeployDuration,
+        Constants.Intake.AgitatorConstants.kAgitationCount);
+  }
 
+  public Command shootingAgitateCommand(
+      double delay, double stowTime, double deployTime, int count) {
     Command agitation = Commands.none();
     for (int i = 0; i < count; i++) {
       agitation =
@@ -188,7 +226,7 @@ public class Intake extends SubsystemBase {
               .andThen(Commands.waitSeconds(deployTime));
     }
 
-    return Commands.waitSeconds(Constants.Intake.AgitatorConstants.kDelayBeforeAgitating)
+    return Commands.waitSeconds(delay)
         .andThen(agitation)
         .withName("ShootingAgitate");
   }

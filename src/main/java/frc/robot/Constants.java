@@ -115,8 +115,8 @@ public final class Constants {
     public static final double kP = 0.06;
 
     public static final class RollerSetpoints {
-      public static final double kIntake = 1;
-      public static final double kExtake = -1;
+      public static final double kIntake = -1;
+      public static final double kExtake = 1;
       public static final double kStop = 0;
     }
 
@@ -129,6 +129,7 @@ public final class Constants {
     public static final class PivotSetpoints {
       // No encoder so use m_pivot.set(PivotSetpoints.WHATEVER)
       public static final double kStow = -0.3;
+      public static final double kHalfStow = kStow / 2.0;
       public static final double kIntake = 0.3;
       public static final double kExtake = 0.3;
       public static final double kAgitate = 0.14;
