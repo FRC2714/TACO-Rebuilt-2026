@@ -59,10 +59,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("FLIP POSE", new InstantCommand(() -> m_robotDrive.zeroPose()));
     NamedCommands.registerCommand("AGITATE", m_intake.agitateCommand().withTimeout(1));
     NamedCommands.registerCommand(
-        "PRESPIN",
-        m_shooter.preSpinCommand().alongWith(m_intake.halfStowWithRollersCommand()));
+        "PRESPIN", m_shooter.preSpinCommand().alongWith(m_intake.halfStowWithRollersCommand()));
     NamedCommands.registerCommand(
-        "SCORE_MOVING", m_superstructure.shooterSequence(true, false, .5, 2.5, 0.5, 1).withTimeout(4.5));
+        "SCORE_MOVING",
+        m_superstructure.shooterSequence(true, false, .5, 2.5, 0.5, 1).withTimeout(4.5));
     NamedCommands.registerCommand(
         "SCORE_MOVING_NO_AGITATE", m_superstructure.shooterSequence(false, false).withTimeout(3));
 

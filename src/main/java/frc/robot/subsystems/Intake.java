@@ -144,10 +144,9 @@ public class Intake extends SubsystemBase {
 
   public Command deployIntake() {
     return this.runOnce(
-      () -> {
-        setPivot(PivotSetpoints.INTAKE);
-      }
-    );
+        () -> {
+          setPivot(PivotSetpoints.INTAKE);
+        });
   }
 
   public Command conveyorCommand() {
@@ -226,9 +225,7 @@ public class Intake extends SubsystemBase {
               .andThen(Commands.waitSeconds(deployTime));
     }
 
-    return Commands.waitSeconds(delay)
-        .andThen(agitation)
-        .withName("ShootingAgitate");
+    return Commands.waitSeconds(delay).andThen(agitation).withName("ShootingAgitate");
   }
 
   public Command stowCommand() {

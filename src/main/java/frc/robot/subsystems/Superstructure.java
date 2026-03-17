@@ -59,12 +59,7 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command shooterSequence(
-      boolean agitate,
-      boolean align,
-      double delay,
-      double stowTime,
-      double deployTime,
-      int count) {
+      boolean agitate, boolean align, double delay, double stowTime, double deployTime, int count) {
     Command feedGroup =
         new SequentialCommandGroup(
             new WaitUntilCommand(() -> m_shooter.isFlywheelSpinning.getAsBoolean()),
