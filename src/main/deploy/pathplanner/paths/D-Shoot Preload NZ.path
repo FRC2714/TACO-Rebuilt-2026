@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.7454698795180725,
-        "y": 5.503537803138374
+        "x": 3.540920114122681,
+        "y": 6.331611982881598
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.002614457831324,
-        "y": 5.357253012048193
+        "x": 3.3145326573163705,
+        "y": 6.225552002678079
       },
       "isLocked": false,
-      "linkedName": "intake-nz"
+      "linkedName": "start-position-NZ"
     },
     {
       "anchor": {
-        "x": 2.3908915662650605,
-        "y": 6.06755421686747
+        "x": 3.0233737517831663,
+        "y": 5.775249643366619
       },
       "prevControl": {
-        "x": 4.838698795180722,
-        "y": 5.313542168674698
+        "x": 3.4092653367412677,
+        "y": 5.907123130393267
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,19 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "PRESPIN",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "PRESPIN"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

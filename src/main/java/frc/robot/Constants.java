@@ -115,8 +115,8 @@ public final class Constants {
     public static final double kP = 0.06;
 
     public static final class RollerSetpoints {
-      public static final double kIntake = 1;
-      public static final double kExtake = -1;
+      public static final double kIntake = -1;
+      public static final double kExtake = 1;
       public static final double kStop = 0;
     }
 
@@ -129,8 +129,17 @@ public final class Constants {
     public static final class PivotSetpoints {
       // No encoder so use m_pivot.set(PivotSetpoints.WHATEVER)
       public static final double kStow = -0.3;
+      public static final double kHalfStow = kStow / 2.0;
       public static final double kIntake = 0.3;
       public static final double kExtake = 0.3;
+      public static final double kAgitate = 0.14;
+    }
+
+    public static final class AgitatorConstants {
+      public static final double kDelayBeforeAgitating = 1.25; // seconds after flywheel spins up
+      public static final int kAgitationCount = 1; // number of stow/deploy cycles
+      public static final double kStowDuration = 1.2; // seconds to hold stow
+      public static final double kDeployDuration = 0.75; // seconds to hold deploy
     }
   }
 
@@ -145,7 +154,34 @@ public final class Constants {
     public static final double kP = 0.08;
     public static final double kI = 0;
     public static final double kD = 0.005;
-    public static final double kAlignTolerance = 1.0; // degrees of tx error
+    public static final double kAlignTolerance = 0.3; // degrees of tx error
+    public static final double kRotationOffsetDeg =
+        0.0; // degrees to nudge aim (+ = left, - = right)
+  }
+
+  public static final class AutoAimConstants {
+    // Passing targets: aimed at the starting line, offset into the trench openings
+    public static final Translation2d kBlueLeftTarget =
+        new Translation2d(
+            frc.robot.FieldConstants.LinesVertical.starting,
+            frc.robot.FieldConstants.LinesHorizontal.leftTrenchOpenEnd - 0.6);
+
+    public static final Translation2d kBlueRightTarget =
+        new Translation2d(
+            frc.robot.FieldConstants.LinesVertical.starting,
+            frc.robot.FieldConstants.LinesHorizontal.rightTrenchOpenStart + 0.6);
+
+    public static final Translation2d kRedLeftTarget =
+        new Translation2d(
+            frc.robot.FieldConstants.fieldLength - frc.robot.FieldConstants.LinesVertical.starting,
+            frc.robot.FieldConstants.fieldWidth
+                - (frc.robot.FieldConstants.LinesHorizontal.leftTrenchOpenEnd - 0.6));
+
+    public static final Translation2d kRedRightTarget =
+        new Translation2d(
+            frc.robot.FieldConstants.fieldLength - frc.robot.FieldConstants.LinesVertical.starting,
+            frc.robot.FieldConstants.fieldWidth
+                - (frc.robot.FieldConstants.LinesHorizontal.rightTrenchOpenStart + 0.6));
   }
 
   public static final class ShooterConstants {
@@ -155,6 +191,8 @@ public final class Constants {
     public static final double kFlywheelDebounceTimeSeconds = 0.1;
     public static final double kLatencyCompensation = 0.1; // seconds
     public static final double kRpmScaleFactor = 0.9; // Scale all lookup RPMs down (tune this)
+    public static final double kRpmPerMpsRadial = 100.0; // RPM per m/s moving away from hub (tune)
+    public static final double kRpmPerMpsLateral = 75.0; // RPM per m/s moving sideways (tune)
 
     public static final class FeederSetpoints {
       public static final double kFeed = 0.95;
@@ -162,6 +200,7 @@ public final class Constants {
 
     public static final class FlywheelSetpoints {
       public static final double kShootRpm = 2200; // fallback default
+      public static final double kPassRpm = 3750; // fallback default
       public static final double kVelocityTolerance = 300;
     }
   }

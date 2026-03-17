@@ -7,37 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start Depot BLUE"
+            "pathName": "D-Shoot Preload NZ"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SCORE"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Intake Depot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Score depot"
+            "name": "SCORE_NO_AGITATE"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SCORE"
+            "name": "DEPLOY_INTAKE"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "D-Intake NZ and Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE_NZ"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Neutral Zone",
   "choreoAuto": false
 }

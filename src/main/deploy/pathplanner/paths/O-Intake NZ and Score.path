@@ -1,0 +1,222 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.0233737517831663,
+        "y": 2.294750356633381
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.23074922476839,
+        "y": 2.3356974680295406
+      },
+      "isLocked": false,
+      "linkedName": "O-score-position"
+    },
+    {
+      "anchor": {
+        "x": 4.899479315263908,
+        "y": 2.4888302425106996
+      },
+      "prevControl": {
+        "x": 4.475871549763877,
+        "y": 2.496484568137338
+      },
+      "nextControl": {
+        "x": 5.453481968458135,
+        "y": 2.478819763357739
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.526027104136947,
+        "y": 1.7642653352353794
+      },
+      "prevControl": {
+        "x": 6.788638822602033,
+        "y": 1.2553655089082314
+      },
+      "nextControl": {
+        "x": 8.293912262241637,
+        "y": 2.2942122212711156
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.030634807417973,
+        "y": 4.597831669044222
+      },
+      "prevControl": {
+        "x": 8.132512071714679,
+        "y": 4.369531377718479
+      },
+      "nextControl": {
+        "x": 7.580084080850749,
+        "y": 5.607486402535628
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.0122039942938645,
+        "y": 4.42962910128388
+      },
+      "prevControl": {
+        "x": 6.342451641332496,
+        "y": 5.691422386171816
+      },
+      "nextControl": {
+        "x": 5.899849850908589,
+        "y": 4.000352148293829
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.701676176890155,
+        "y": 2.592339514978602
+      },
+      "prevControl": {
+        "x": 6.329762112560816,
+        "y": 3.090178634906048
+      },
+      "nextControl": {
+        "x": 5.371141788380383,
+        "y": 2.3303483769255666
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.273,
+        "y": 2.243
+      },
+      "prevControl": {
+        "x": 2.3036564306597915,
+        "y": 2.4911132468434554
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "O-intake-NZ"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 2,
+      "rotationDegrees": 57.72435568542245
+    },
+    {
+      "waypointRelativePos": 3,
+      "rotationDegrees": 100.8230112262071
+    },
+    {
+      "waypointRelativePos": 4.0,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 5.3327800829875525,
+      "rotationDegrees": -90.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "BUMP-1",
+      "minWaypointRelativePos": 0.35056657223795945,
+      "maxWaypointRelativePos": 1.1437677053824336,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "NZ-FUEL",
+      "minWaypointRelativePos": 2.2344192634560844,
+      "maxWaypointRelativePos": 3.1,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "SCORE_MOVING",
+      "waypointRelativePos": 0.19446320054017363,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "SCORE_MOVING"
+        }
+      }
+    },
+    {
+      "name": "INTAKE_NZ",
+      "waypointRelativePos": 1.554469273743019,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE_NZ"
+        }
+      }
+    },
+    {
+      "name": "AGITATE",
+      "waypointRelativePos": 4.738826815642463,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "PRESPIN",
+      "waypointRelativePos": 5.057262569832392,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "PRESPIN"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 43.727
+  },
+  "reversed": false,
+  "folder": "Outpost Preload to NZ",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 50.792796495032114
+  },
+  "useDefaultConstraints": true
+}

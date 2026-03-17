@@ -45,20 +45,26 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence().withTimeout(5));
+    NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence(true).withTimeout(3.5));
     NamedCommands.registerCommand(
-        "INTAKE",
-        m_intake
-            .intakeCommand()
-            .alongWith(
-                m_shooter
-                    .runFeederOnlyCommand(Constants.ShooterConstants.FeederSetpoints.kFeed * 0.2)
-                    .withTimeout(2))
-            .withTimeout(5));
+        "SCORE_NO_AGITATE", m_superstructure.shooterSequence(false).withTimeout(2.55));
+    NamedCommands.registerCommand(
+        "SCORE_NZ", m_superstructure.shooterSequence(true, .5, 0.85, 0.5, 1).withTimeout(6.5));
+    NamedCommands.registerCommand("INTAKE", m_intake.intakeCommand().withTimeout(2.5));
+    NamedCommands.registerCommand("INTAKE_NZ", m_intake.intakeCommand().withTimeout(7.5));
+    NamedCommands.registerCommand("DEPLOY_INTAKE", m_intake.deployIntake());
     NamedCommands.registerCommand("WAIT", new WaitCommand(5));
     NamedCommands.registerCommand(
         "ZERO DRIVER HEADING", new InstantCommand(() -> m_robotDrive.zeroDriverHeading()));
     NamedCommands.registerCommand("FLIP POSE", new InstantCommand(() -> m_robotDrive.zeroPose()));
+    NamedCommands.registerCommand("AGITATE", m_intake.agitateCommand().withTimeout(1));
+    NamedCommands.registerCommand(
+        "PRESPIN", m_shooter.preSpinCommand().alongWith(m_intake.halfStowWithRollersCommand()));
+    NamedCommands.registerCommand(
+        "SCORE_MOVING",
+        m_superstructure.shooterSequence(true, false, .5, 2.5, 0.5, 1).withTimeout(4.5));
+    NamedCommands.registerCommand(
+        "SCORE_MOVING_NO_AGITATE", m_superstructure.shooterSequence(false, false).withTimeout(3));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -99,9 +105,10 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
 
     // Intake Commands
-    m_driverController.x().onTrue(m_intake.stowCommand());
+    m_driverController.x().onTrue(m_superstructure.stowCommand());
     m_driverController.leftTrigger().whileTrue(m_intake.intakeCommand());
     m_driverController.povDown().whileTrue(m_intake.extakeCommand());
+    m_driverController.leftBumper().onTrue(m_intake.agitateCommand());
 
     // Shoot Commands
     m_driverController.rightTrigger().whileTrue(m_superstructure.shooterSequence());

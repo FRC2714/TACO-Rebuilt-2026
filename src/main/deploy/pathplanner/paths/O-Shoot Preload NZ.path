@@ -3,35 +3,47 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4945903614457823,
-        "y": 4.00221686746988
+        "x": 3.540920114122681,
+        "y": 1.738388017118402
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.11212048192771,
-        "y": 4.024072289156626
+        "x": 3.3145326573163705,
+        "y": 1.844447997321921
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "O-start-position-NZ"
     },
     {
       "anchor": {
-        "x": 2.2597590361445783,
-        "y": 4.00221686746988
+        "x": 3.0233737517831663,
+        "y": 2.294750356633381
       },
       "prevControl": {
-        "x": 2.5033568350682334,
-        "y": 4.05843174414457
+        "x": 3.4092653367412677,
+        "y": 2.162876869606733
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "middle-score"
+      "linkedName": "O-score-position"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "PRESPIN",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "PRESPIN"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -42,13 +54,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 50.792796495032114
   },
   "reversed": false,
-  "folder": "Shoot Preload",
+  "folder": "Outpost Preload to NZ",
   "idealStartingState": {
-    "velocity": 0.0,
-    "rotation": 180.0
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

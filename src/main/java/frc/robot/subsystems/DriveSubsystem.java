@@ -253,6 +253,13 @@ public class DriveSubsystem extends SubsystemBase {
       rotDelivered = alignRotSpeed;
     }
 
+    // X-lock when shooting and stationary for defense resistance
+    boolean driverStationary = Math.abs(xSpeed) < 0.05 && Math.abs(ySpeed) < 0.05;
+    if (shooting && driverStationary) {
+      setX();
+      return;
+    }
+
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
@@ -268,6 +275,18 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
+  }
+
+  /** Returns the robot's field-relative velocity from swerve module states. */
+  public Translation2d getFieldRelativeVelocity() {
+    ChassisSpeeds robotSpeeds =
+        DriveConstants.kDriveKinematics.toChassisSpeeds(
+            m_frontLeft.getState(),
+            m_frontRight.getState(),
+            m_rearLeft.getState(),
+            m_rearRight.getState());
+    return new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
+        .rotateBy(getPose().getRotation());
   }
 
   /** Sets the wheels into an X formation to prevent movement. */
@@ -290,6 +309,19 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
+  }
+
+  /** Returns true if the robot is within its own alliance zone (behind the starting line). */
+  public boolean isInAllianceZone() {
+    double x = getPose().getTranslation().getX();
+    boolean isRed =
+        DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+            == DriverStation.Alliance.Red;
+    if (isRed) {
+      return x > frc.robot.FieldConstants.LinesVertical.oppAllianceZone;
+    } else {
+      return x < frc.robot.FieldConstants.LinesVertical.allianceZone;
+    }
   }
 
   public void setAligning(boolean aligning) {
@@ -343,7 +375,6 @@ public class DriveSubsystem extends SubsystemBase {
         },
         pose);
 
-    // Seed orientation, then switch to fused IMU mode after a brief delay
     LimelightHelpers.SetRobotOrientation(LimelightConstants.kFrontName, 0, 0, 0, 0, 0, 0);
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 1);
     LimelightHelpers.SetRobotOrientation(LimelightConstants.kBackName, 0, 0, 0, 0, 0, 0);

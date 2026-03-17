@@ -7,49 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Shoot Preload NZ"
+            "pathName": "O-Shoot Preload NZ"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SCORE"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Start Intake NZ"
+            "name": "SCORE_NO_AGITATE"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "INTAKE"
+            "name": "DEPLOY_INTAKE"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Intake NZ"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Shoot NZ"
+            "pathName": "O-Intake NZ and Score"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SCORE"
+            "name": "SCORE_NZ"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Neutral Zone",
   "choreoAuto": false
 }
