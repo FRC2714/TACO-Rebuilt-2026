@@ -41,8 +41,6 @@ public class RobotContainer {
   // The driver's controller
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
-  CommandXboxController m_operatorController =
-      new CommandXboxController(OIConstants.kOperatorControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -117,12 +115,6 @@ public class RobotContainer {
     m_driverController
         .rightBumper()
         .whileTrue(m_superstructure.passingSequence()); // Shoot without auto aligning (passing)
-
-    // Operator Controls
-    m_operatorController
-        .rightTrigger()
-        .whileTrue(m_shooter.preSpinCommand().alongWith(m_intake.halfStowWithRollersCommand()));
-    m_operatorController.leftBumper().onTrue(m_intake.agitateCommand());
   }
 
   /**
