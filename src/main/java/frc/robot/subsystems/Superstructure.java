@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -144,19 +145,101 @@ public class Superstructure extends SubsystemBase {
     }
   }
 
+  // Phase shift timing
+  private static final int[] PHASE_SHIFT_TIMES = {130, 105, 80, 55, 30};
+  private static final double PHASE_SHIFT_WARNING_SECONDS = 5.0;
+
+  // Randomized for practice without FMS — re-randomized each boot
+  private final boolean practiceRedInactiveFirst = Math.random() < 0.5;
+
+  private double getTimeUntilNextPhaseShift(double matchTime) {
+    if (!DriverStation.isTeleopEnabled()) return -1;
+    for (int boundary : PHASE_SHIFT_TIMES) {
+      if (matchTime >= boundary) return matchTime - boundary;
+    }
+    return -1;
+  }
+
+  private boolean isPhaseShiftWarning(double matchTime) {
+    double timeUntil = getTimeUntilNextPhaseShift(matchTime);
+    return timeUntil > 0 && timeUntil <= PHASE_SHIFT_WARNING_SECONDS;
+  }
+
+  private boolean getPhaseShiftDashboardValue(double matchTime, boolean hubActive) {
+    if (!isPhaseShiftWarning(matchTime)) return hubActive;
+    // Flash at 4Hz during warning window
+    return ((int) Math.floor(matchTime * 4.0)) % 2 == 0;
+  }
+
+  /**
+   * Returns true if our alliance's hub is currently active. Game data "R" = Red hub inactive first,
+   * "B" = Blue hub inactive first. Shift1Active alternates: active in shifts 1,3; inactive in 2,4.
+   */
+  private boolean isOurHubActive() {
+    if (DriverStation.isAutonomousEnabled()) return true;
+    if (!DriverStation.isTeleopEnabled()) return false;
+
+    double matchTime = DriverStation.getMatchTime();
+    String gameData = DriverStation.getGameSpecificMessage();
+
+    boolean redInactiveFirst;
+    if (gameData.isEmpty()) {
+      // No FMS: use randomized practice result
+      redInactiveFirst = practiceRedInactiveFirst;
+    } else {
+      switch (gameData.charAt(0)) {
+        case 'R':
+          redInactiveFirst = true;
+          break;
+        case 'B':
+          redInactiveFirst = false;
+          break;
+        default:
+          return true; // corrupt data, safe fallback
+      }
+    }
+
+    // shift1Active: true if our hub is active during shifts 1 & 3
+    boolean shift1Active = Field.isRed() ? !redInactiveFirst : redInactiveFirst;
+
+    if (matchTime > 130) {
+      return true; // transition shift
+    } else if (matchTime > 105) {
+      return shift1Active;
+    } else if (matchTime > 80) {
+      return !shift1Active;
+    } else if (matchTime > 55) {
+      return shift1Active;
+    } else if (matchTime > 30) {
+      return !shift1Active;
+    } else {
+      return true; // endgame, always active
+    }
+  }
+
   @Override
   public void periodic() {
     Pose2d pose = m_driveSubsystem.getPose();
     Translation2d robotPosition = pose.getTranslation();
     boolean inAllianceZone = m_driveSubsystem.isInAllianceZone();
+    boolean hubActive = isOurHubActive();
 
     // In alliance zone: aim at hub. Outside: aim at passing target.
     Translation2d target =
         inAllianceZone ? Field.getAllianceHub().toTranslation2d() : getPassingTarget();
 
+    double matchTime = DriverStation.getMatchTime();
+    double timeToNextShift = getTimeUntilNextPhaseShift(matchTime);
+
     double distanceToTarget = robotPosition.getDistance(target);
     SmartDashboard.putNumber("Distance to Hub", distanceToTarget);
     SmartDashboard.putBoolean("In Alliance Zone", inAllianceZone);
+    SmartDashboard.putNumber("Match Time", matchTime);
+    SmartDashboard.putBoolean(
+        "Match/Hub Active", getPhaseShiftDashboardValue(matchTime, hubActive));
+    SmartDashboard.putString(
+        "Match/Time Until Next Phase Shift",
+        timeToNextShift >= 0 ? String.format("%.2f", timeToNextShift) : "N/A");
 
     m_shooter.calculate(
         robotPosition,
@@ -168,5 +251,8 @@ public class Superstructure extends SubsystemBase {
     m_driveSubsystem.setTargetHeading(
         m_shooter.getCalculatedHeadingDeg()
             + frc.robot.Constants.AutoAlignConstants.kRotationOffsetDeg);
+
+    // Auto pre-spin: keep flywheel hot when hub is active and we're in alliance zone
+    m_shooter.setAutoPreSpin(hubActive && inAllianceZone);
   }
 }

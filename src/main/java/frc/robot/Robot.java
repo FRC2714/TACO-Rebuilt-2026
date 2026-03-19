@@ -93,9 +93,9 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
-    // Sync driver heading with pose estimator so field-relative
-    // driving works correctly on both alliances after auton.
-    m_robotContainer.m_robotDrive.zeroDriverHeading();
+    // Set driver forward to face opponent wall based on alliance.
+    // Uses pose data so no manual gyro reset needed after auto.
+    m_robotContainer.m_robotDrive.setDriverHeadingToAllianceWall();
   }
 
   /** This function is called periodically during operator control. */

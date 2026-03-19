@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "SCORE"
+            "name": "SCORE_NO_AGITATE"
           }
         },
         {
@@ -38,12 +38,6 @@
           "type": "named",
           "data": {
             "name": "SCORE"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "outpost-back-to-start"
           }
         },
         {
