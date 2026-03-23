@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.0233737517831663,
-        "y": 5.775249643366619
+        "x": 3.560328102710413,
+        "y": 5.64586305278174
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.233403413549551,
-        "y": 5.543793158580364
+        "x": 5.814199013986768,
+        "y": 5.6268955416040045
       },
       "isLocked": false,
-      "linkedName": "score-position"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -20,28 +20,28 @@
         "y": 5.64586305278174
       },
       "prevControl": {
-        "x": 4.352165663511936,
-        "y": 5.615954807193206
+        "x": 4.432526379876846,
+        "y": 5.665179136341342
       },
       "nextControl": {
-        "x": 5.319742427784296,
-        "y": 5.6694610053773475
+        "x": 5.4124549005984335,
+        "y": 5.624073696434455
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.92437945791726,
-        "y": 6.150470756062767
+        "x": 7.480741797432238,
+        "y": 6.046961483594864
       },
       "prevControl": {
-        "x": 5.914020613308285,
-        "y": 5.544255449297383
+        "x": 6.342139800285304,
+        "y": 5.827004279600569
       },
       "nextControl": {
-        "x": 8.218245363766048,
-        "y": 6.92679029957204
+        "x": 8.206638210791239,
+        "y": 6.187191472539218
       },
       "isLocked": false,
       "linkedName": null
@@ -52,12 +52,12 @@
         "y": 3.627432239657632
       },
       "prevControl": {
-        "x": 7.8855797661884965,
-        "y": 3.9454613960476443
+        "x": 7.910115447522685,
+        "y": 3.8595030376885178
       },
       "nextControl": {
-        "x": 7.58066648027172,
-        "y": 2.5284323106318087
+        "x": 7.536803495730892,
+        "y": 2.9276305325967007
       },
       "isLocked": false,
       "linkedName": null
@@ -68,12 +68,12 @@
         "y": 3.627432239657632
       },
       "prevControl": {
-        "x": 6.397225100964902,
-        "y": 2.851024381985773
+        "x": 6.320101274631348,
+        "y": 2.93249509822119
       },
       "nextControl": {
-        "x": 5.77025645296353,
-        "y": 4.136934036135501
+        "x": 5.781099497131942,
+        "y": 4.17515475695633
       },
       "isLocked": false,
       "linkedName": null
@@ -84,12 +84,12 @@
         "y": 5.269831325301205
       },
       "prevControl": {
-        "x": 6.070427960057061,
-        "y": 4.42962910128388
+        "x": 6.375770479135552,
+        "y": 4.757883469003036
       },
       "nextControl": {
-        "x": 5.741326379044395,
-        "y": 5.857917772949926
+        "x": 5.274291750750977,
+        "y": 5.888080747410526
       },
       "isLocked": false,
       "linkedName": null
@@ -100,8 +100,8 @@
         "y": 5.827
       },
       "prevControl": {
-        "x": 2.2344363424787628,
-        "y": 5.57999221810116
+        "x": 2.3250182800767427,
+        "y": 5.496104975238415
       },
       "nextControl": null,
       "isLocked": false,
@@ -111,11 +111,11 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1,
-      "rotationDegrees": -90.0
+      "rotationDegrees": 0.0
     },
     {
       "waypointRelativePos": 2,
-      "rotationDegrees": 0.0
+      "rotationDegrees": -59.53445508054007
     },
     {
       "waypointRelativePos": 2.635394456289986,
@@ -161,17 +161,6 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "SCORE_MOVING",
-      "waypointRelativePos": 0.19446320054017363,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "SCORE_MOVING"
-        }
-      }
-    },
-    {
       "name": "INTAKE_NZ",
       "waypointRelativePos": 1.6717877094972033,
       "endWaypointRelativePos": null,
@@ -184,7 +173,7 @@
     },
     {
       "name": "AGITATE",
-      "waypointRelativePos": 4.789106145251392,
+      "waypointRelativePos": 5.088453747467927,
       "endWaypointRelativePos": null,
       "command": null
     },
@@ -216,7 +205,7 @@
   "folder": "Depot Preload to NZ",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -50.792796495032114
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
