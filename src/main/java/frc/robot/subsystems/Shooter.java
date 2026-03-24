@@ -46,6 +46,7 @@ public class Shooter extends SubsystemBase {
   private double flywheelTargetVelocity = 0.0;
   private double calculatedRpm = FlywheelSetpoints.kShootRpm;
   private double calculatedHeadingDeg = 0.0;
+  private boolean autoPreSpin = false;
 
   public Shooter() {
     flywheelMotor.configure(
@@ -110,6 +111,10 @@ public class Shooter extends SubsystemBase {
     shooterMap.put(4.5, new ShooterParams(3000, 1.3));
     shooterMap.put(4.65, new ShooterParams(3150, 1.4));
     shooterMap.put(5.2, new ShooterParams(3500, 1.4));
+    shooterMap.put(6.0, new ShooterParams(4000, 1.5));
+    shooterMap.put(7.0, new ShooterParams(4600, 1.6));
+    shooterMap.put(8.0, new ShooterParams(5200, 1.7));
+    shooterMap.put(9.0, new ShooterParams(5800, 1.8));
   }
 
   public void calculate(
@@ -168,6 +173,10 @@ public class Shooter extends SubsystemBase {
     return calculatedHeadingDeg;
   }
 
+  public void setAutoPreSpin(boolean active) {
+    this.autoPreSpin = active;
+  }
+
   /** Pre-spin the flywheel to calculatedRpm. Keeps running until interrupted by another command. */
   public Command preSpinCommand() {
     return this.run(() -> this.setFlywheelVelocity(calculatedRpm)).withName("PreSpin");
@@ -192,10 +201,10 @@ public class Shooter extends SubsystemBase {
     return spinUntilUp.andThen(feederPhase).withName("Shooting");
   }
 
-  /** Spin up flywheel to pass RPM, then run feeder. */
+  /** Spin up flywheel using calculatedRpm (no auto-align override), then run feeder. */
   public Command runPassCommand() {
     Command spinUntilUp =
-        this.run(() -> this.setFlywheelVelocity(FlywheelSetpoints.kPassRpm))
+        this.run(() -> this.setFlywheelVelocity(calculatedRpm))
             .until(isFlywheelSpinning)
             .withName("SpinUntilUp");
 
@@ -224,6 +233,16 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // Auto pre-spin: keep flywheel at speed when hub is active + in alliance zone
+    // Only when no command (like shoot) is actively controlling the shooter
+    if (getCurrentCommand() == null) {
+      if (autoPreSpin) {
+        setFlywheelVelocity(calculatedRpm);
+      } else {
+        setFlywheelVelocity(0);
+      }
+    }
+
     SmartDashboard.putNumber("Shooter/Feeder/Applied Output", feederMotor.getAppliedOutput());
     SmartDashboard.putNumber("Shooter/Flywheel/Applied Output", flywheelMotor.getAppliedOutput());
     SmartDashboard.putNumber("Shooter/Flywheel/Current", flywheelMotor.getOutputCurrent());

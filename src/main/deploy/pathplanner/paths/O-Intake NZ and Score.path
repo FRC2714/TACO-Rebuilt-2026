@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.0233737517831663,
-        "y": 2.294750356633381
+        "x": 3.52151212553495,
+        "y": 2.4888302425106996
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.23074922476839,
-        "y": 2.3356974680295406
+        "x": 5.580005302915797,
+        "y": 2.44612037560977
       },
       "isLocked": false,
-      "linkedName": "O-score-position"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -20,44 +20,44 @@
         "y": 2.4888302425106996
       },
       "prevControl": {
-        "x": 4.475871549763877,
-        "y": 2.496484568137338
+        "x": 4.207261055634806,
+        "y": 2.501768901569187
       },
       "nextControl": {
-        "x": 5.453481968458135,
-        "y": 2.478819763357739
+        "x": 5.538096515152443,
+        "y": 2.4768934724193254
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.526027104136947,
-        "y": 1.7642653352353794
+        "x": 7.6360057061340925,
+        "y": 2.243
       },
       "prevControl": {
-        "x": 6.788638822602033,
-        "y": 1.2553655089082314
+        "x": 6.87262482168331,
+        "y": 1.673694721825964
       },
       "nextControl": {
-        "x": 8.293912262241637,
-        "y": 2.2942122212711156
+        "x": 8.549164403929085,
+        "y": 2.9240048261022915
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.030634807417973,
-        "y": 4.597831669044222
+        "x": 7.95947218259629,
+        "y": 4.6366476462196875
       },
       "prevControl": {
-        "x": 8.132512071714679,
-        "y": 4.369531377718479
+        "x": 8.167991095599689,
+        "y": 4.214845619447867
       },
       "nextControl": {
-        "x": 7.580084080850749,
-        "y": 5.607486402535628
+        "x": 7.5546850157637495,
+        "y": 5.455470480666391
       },
       "isLocked": false,
       "linkedName": null
@@ -68,12 +68,12 @@
         "y": 4.42962910128388
       },
       "prevControl": {
-        "x": 6.342451641332496,
-        "y": 5.691422386171816
+        "x": 6.39838362765304,
+        "y": 5.695500043617163
       },
       "nextControl": {
-        "x": 5.899849850908589,
-        "y": 4.000352148293829
+        "x": 5.832112382913062,
+        "y": 3.839300875473732
       },
       "isLocked": false,
       "linkedName": null
@@ -84,12 +84,12 @@
         "y": 2.592339514978602
       },
       "prevControl": {
-        "x": 6.329762112560816,
-        "y": 3.090178634906048
+        "x": 6.399367877873503,
+        "y": 3.0642521531085856
       },
       "nextControl": {
-        "x": 5.371141788380383,
-        "y": 2.3303483769255666
+        "x": 5.4535295073306465,
+        "y": 2.424495251803409
       },
       "isLocked": false,
       "linkedName": null
@@ -100,8 +100,8 @@
         "y": 2.243
       },
       "prevControl": {
-        "x": 2.3036564306597915,
-        "y": 2.4911132468434554
+        "x": 2.4063195300960625,
+        "y": 2.8343925694088776
       },
       "nextControl": null,
       "isLocked": false,
@@ -111,11 +111,11 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1,
-      "rotationDegrees": 90.0
+      "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 2,
-      "rotationDegrees": 57.72435568542245
+      "waypointRelativePos": 1.496801705756938,
+      "rotationDegrees": -1.6602823689830335
     },
     {
       "waypointRelativePos": 3,
@@ -149,7 +149,7 @@
       "minWaypointRelativePos": 2.2344192634560844,
       "maxWaypointRelativePos": 3.1,
       "constraints": {
-        "maxVelocity": 2.0,
+        "maxVelocity": 2.5,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -161,19 +161,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "SCORE_MOVING",
-      "waypointRelativePos": 0.19446320054017363,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "SCORE_MOVING"
-        }
-      }
-    },
-    {
       "name": "INTAKE_NZ",
-      "waypointRelativePos": 1.554469273743019,
+      "waypointRelativePos": 1.4584740040513142,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -184,7 +173,7 @@
     },
     {
       "name": "AGITATE",
-      "waypointRelativePos": 4.738826815642463,
+      "waypointRelativePos": 4.99122214719784,
       "endWaypointRelativePos": null,
       "command": null
     },
@@ -216,7 +205,7 @@
   "folder": "Outpost Preload to NZ",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 50.792796495032114
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

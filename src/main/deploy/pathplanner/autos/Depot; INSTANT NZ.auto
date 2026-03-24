@@ -5,18 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "D-Shoot Preload NZ"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SCORE_NO_AGITATE"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "DEPLOY_INTAKE"

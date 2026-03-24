@@ -51,15 +51,14 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "SCORE_NZ", m_superstructure.shooterSequence(true, .5, 0.85, 0.5, 1).withTimeout(6.5));
     NamedCommands.registerCommand("INTAKE", m_intake.intakeCommand().withTimeout(2.5));
-    NamedCommands.registerCommand("INTAKE_NZ", m_intake.intakeCommand().withTimeout(7.5));
+    NamedCommands.registerCommand("INTAKE_NZ", m_intake.intakeCommand().withTimeout(8.25));
     NamedCommands.registerCommand("DEPLOY_INTAKE", m_intake.deployIntake());
     NamedCommands.registerCommand("WAIT", new WaitCommand(5));
     NamedCommands.registerCommand(
         "ZERO DRIVER HEADING", new InstantCommand(() -> m_robotDrive.zeroDriverHeading()));
     NamedCommands.registerCommand("FLIP POSE", new InstantCommand(() -> m_robotDrive.zeroPose()));
     NamedCommands.registerCommand("AGITATE", m_intake.agitateCommand().withTimeout(1));
-    NamedCommands.registerCommand(
-        "PRESPIN", m_shooter.preSpinCommand().alongWith(m_intake.halfStowWithRollersCommand()));
+    NamedCommands.registerCommand("PRESPIN", m_shooter.preSpinCommand());
     NamedCommands.registerCommand(
         "SCORE_MOVING",
         m_superstructure.shooterSequence(true, false, .5, 2.5, 0.5, 1).withTimeout(4.5));

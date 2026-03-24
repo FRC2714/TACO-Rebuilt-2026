@@ -361,6 +361,14 @@ public class DriveSubsystem extends SubsystemBase {
     m_driverHeadingOffsetDeg = getPose().getRotation().getDegrees();
   }
 
+  /** Sets driver forward to face the opponent alliance wall based on current alliance. */
+  public void setDriverHeadingToAllianceWall() {
+    boolean isRed =
+        DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+            == DriverStation.Alliance.Red;
+    m_driverHeadingOffsetDeg = isRed ? 180.0 : 0.0;
+  }
+
   /** Resets pose to origin and re-seeds Limelight IMU. */
   public void zeroPose() {
     Pose2d pose = new Pose2d();
