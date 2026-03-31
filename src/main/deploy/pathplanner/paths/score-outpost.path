@@ -1,0 +1,77 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.266462196861626,
+        "y": 2.074793152639087
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.033566333808844,
+        "y": 1.7901426533523532
+      },
+      "isLocked": false,
+      "linkedName": "Shoot Position"
+    },
+    {
+      "anchor": {
+        "x": 0.6750071326676175,
+        "y": 0.6256633380884444
+      },
+      "prevControl": {
+        "x": 1.3219400855920114,
+        "y": 1.104393723252496
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "outpost-Intake"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "DEPLOY_INTAKE",
+      "waypointRelativePos": 0.1,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "DEPLOY_INTAKE"
+        }
+      }
+    },
+    {
+      "name": "INTAKE",
+      "waypointRelativePos": 0.4,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 178.80651057601813
+  },
+  "reversed": false,
+  "folder": "Outpost",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 39.44005273669041
+  },
+  "useDefaultConstraints": true
+}

@@ -1,0 +1,66 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.6750071326676175,
+        "y": 0.6256633380884444
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.3343793648583149,
+        "y": 0.8862348770171031
+      },
+      "isLocked": false,
+      "linkedName": "outpost-Intake"
+    },
+    {
+      "anchor": {
+        "x": 2.266462196861626,
+        "y": 2.074793152639087
+      },
+      "prevControl": {
+        "x": 1.1911958867364825,
+        "y": 1.2581113415564522
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Shoot Position"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "PRESPIN",
+      "waypointRelativePos": 0.3,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "PRESPIN"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 39.44005273669041
+  },
+  "reversed": false,
+  "folder": "Outpost",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 178.80651057601813
+  },
+  "useDefaultConstraints": true
+}

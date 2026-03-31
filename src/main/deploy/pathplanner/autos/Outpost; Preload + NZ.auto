@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "O-Shoot Preload NZ"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE_NO_AGITATE"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DEPLOY_INTAKE"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "O-Intake NZ and Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE_NZ"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Neutral Zone",
+  "choreoAuto": false
+}

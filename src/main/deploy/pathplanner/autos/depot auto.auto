@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Start Depot BLUE"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Intake Depot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score depot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -1,0 +1,25 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "(Outpost Side) Shoot Preload"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Shoot Preload",
+  "choreoAuto": false
+}

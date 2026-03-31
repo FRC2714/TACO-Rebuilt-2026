@@ -7,6 +7,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import frc.robot.Constants.ModuleConstants;
 
 public final class Configs {
+
   public static final class MAXSwerveModule {
     public static final SparkFlexConfig drivingConfig = new SparkFlexConfig();
     public static final SparkFlexConfig turningConfig = new SparkFlexConfig();
@@ -19,7 +20,7 @@ public final class Configs {
       double nominalVoltage = 12.0;
       double drivingVelocityFeedForward = nominalVoltage / ModuleConstants.kDriveWheelFreeSpeedRps;
 
-      drivingConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(50);
+      drivingConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(70);
       drivingConfig
           .encoder
           .positionConversionFactor(drivingFactor) // meters
@@ -33,7 +34,7 @@ public final class Configs {
           .feedForward
           .kV(drivingVelocityFeedForward);
 
-      turningConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(20);
+      turningConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(70);
 
       turningConfig
           .absoluteEncoder
@@ -42,8 +43,7 @@ public final class Configs {
           .inverted(true)
           .positionConversionFactor(turningFactor) // radians
           .velocityConversionFactor(turningFactor / 60.0) // radians per second
-          // This applies to REV Through Bore Encoder V2 (use REV_ThroughBoreEncoder for V1):
-          .apply(AbsoluteEncoderConfig.Presets.REV_ThroughBoreEncoderV2);
+          .apply(AbsoluteEncoderConfig.Presets.REV_ThroughBoreEncoder);
 
       turningConfig
           .closedLoop
@@ -57,6 +57,105 @@ public final class Configs {
           // longer route.
           .positionWrappingEnabled(true)
           .positionWrappingInputRange(0, turningFactor);
+    }
+  }
+
+  public static final class Intake {
+    public static final SparkFlexConfig rollerConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig pivotConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig conveyorConfig = new SparkFlexConfig();
+
+    static {
+      // Configure basic setting of the arm motor
+      pivotConfig
+          .smartCurrentLimit(40)
+          .idleMode(IdleMode.kBrake)
+          .inverted(true)
+          .voltageCompensation(12);
+      pivotConfig
+          .absoluteEncoder
+          .positionConversionFactor(360 / Constants.Intake.kPivotReduction)
+          .inverted(false)
+          .zeroCentered(false); // tune later
+      pivotConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+          // Set PID values for position control. We don't need to pass a closed
+          // loop slot, as it will default to slot 0.
+          .p(Constants.Intake.kP)
+          .d(0)
+          .outputRange(-1, 1)
+          .positionWrappingEnabled(true)
+          .positionWrappingInputRange(0, 360)
+          .maxMotion
+          .cruiseVelocity(4200 * 360)
+          .maxAcceleration(6000 * 360)
+          .allowedProfileError(0.5);
+
+      // Configure basic settings of the intake motor
+      rollerConfig
+          .inverted(false)
+          .idleMode(IdleMode.kCoast)
+          .smartCurrentLimit(80)
+          .voltageCompensation(12);
+      conveyorConfig
+          .inverted(false)
+          .idleMode(IdleMode.kCoast)
+          .smartCurrentLimit(80)
+          .voltageCompensation(12);
+    }
+  }
+
+  public static final class Shooter {
+    public static final SparkFlexConfig flywheelConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig flywheelFollowerConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig feederConfig = new SparkFlexConfig();
+
+    static {
+      // Configure basic setting of the flywheel motors
+      flywheelConfig
+          .inverted(true)
+          .idleMode(IdleMode.kCoast)
+          .closedLoopRampRate(1.0)
+          .openLoopRampRate(1.0)
+          .smartCurrentLimit(80);
+
+      /*
+       * Configure the closed loop controller. We want to make sure we set the
+       * feedback sensor as the primary encoder.
+       */
+      flywheelConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          // Set PID values for position control
+          .p(0.0002)
+          .outputRange(-1, 1);
+
+      //   flywheelConfig
+      //       .closedLoop
+      //       .maxMotion
+      //       // Set MAXMotion parameters for MAXMotion Velocity control
+      //       .cruiseVelocity(2000)
+      //       .maxAcceleration(4000)
+      //       .allowedProfileError(1);
+
+      // Constants.NeoMotorConstants.kVortexKv is in rpm/V. feedforward.kV is in V/rpm sort we take
+      // the reciprocol.
+      flywheelConfig.closedLoop.feedForward.kV(.0018);
+
+      //   flywheelConfig.encoder.velocityConversionFactor(34./46.);
+
+      // Configure the follower flywheel motor to follow the main flywheel motor
+      flywheelFollowerConfig
+          .apply(flywheelConfig)
+          .follow(Constants.ShooterConstants.kFlywheelMotorCanId, true);
+
+      // Configure basic setting of the feeder motor
+      feederConfig
+          .inverted(true)
+          .idleMode(IdleMode.kCoast)
+          .openLoopRampRate(1.0)
+          .smartCurrentLimit(60);
     }
   }
 }

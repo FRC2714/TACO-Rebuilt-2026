@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import frc.robot.Constants.LimelightConstants;
+import frc.robot.utils.LimelightHelpers;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -71,21 +73,23 @@ public void simulationPeriodic() {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    double heading = m_robotContainer.m_robotDrive.getPose().getRotation().getDegrees();
+    LimelightHelpers.SetRobotOrientation(LimelightConstants.kFrontName, heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 1);
+
+    LimelightHelpers.SetRobotOrientation(LimelightConstants.kBackName, heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 1);
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 4);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 4);
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    /*
-     * String autoSelected = SmartDashboard.getString("Auto Selector",
-     * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
-     * = new MyAutoCommand(); break; case "Default Auto": default:
-     * autonomousCommand = new ExampleCommand(); break; }
-     */
-
-    // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
@@ -97,6 +101,9 @@ public void simulationPeriodic() {
 
   @Override
   public void teleopInit() {
+    LimelightHelpers.SetIMUMode(LimelightConstants.kFrontName, 4);
+    LimelightHelpers.SetIMUMode(LimelightConstants.kBackName, 4);
+
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -104,6 +111,10 @@ public void simulationPeriodic() {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    // Set driver forward to face opponent wall based on alliance.
+    // Uses pose data so no manual gyro reset needed after auto.
+    m_robotContainer.m_robotDrive.setDriverHeadingToAllianceWall();
   }
 
   /** This function is called periodically during operator control. */
