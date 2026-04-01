@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkSim;
@@ -15,6 +18,9 @@ import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
   private SparkFlex m_pivot = new SparkFlex(Constants.Intake.kPivotCanId, MotorType.kBrushless);
+  private RelativeEncoder m_pivotEncoder = m_pivot.getEncoder();
+  private SparkClosedLoopController m_pivotController = m_pivot.getClosedLoopController();
+
   private SparkFlex m_roller = new SparkFlex(Constants.Intake.kRollerCanId, MotorType.kBrushless);
   private SparkFlex m_conveyor =
       new SparkFlex(Constants.Intake.kConveyorCanId, MotorType.kBrushless);
@@ -22,15 +28,7 @@ public class Intake extends SubsystemBase {
   private SparkSim rollerSim;
   private SparkSim conveyorSim;
 
-  private double pivotSpeed = Constants.Intake.PivotSetpoints.kStow;
-
-  private enum PivotSetpoints {
-    STOW,
-    HALF_STOW,
-    INTAKE,
-    EXTAKE,
-    AGITATE
-  }
+  private double pivotSetpoint = Constants.Intake.PivotSetpoints.kStow;
 
   private enum RollerSetpoints {
     INTAKE,
@@ -55,6 +53,10 @@ public class Intake extends SubsystemBase {
         Configs.Intake.conveyorConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+
+    // Zero the relative encoder — intake always starts stowed
+    m_pivotEncoder.setPosition(0);
+
     DCMotor motorModel = DCMotor.getNEO(1);
     rollerSim = new SparkSim(m_roller, motorModel);
     conveyorSim = new SparkSim(m_conveyor, motorModel);
@@ -96,45 +98,43 @@ public class Intake extends SubsystemBase {
     m_conveyor.set(speed);
   }
 
-  private void setPivot(PivotSetpoints setpoint) {
-    double setSpeed = 0;
-    switch (setpoint) {
-      case STOW:
-        setSpeed = Constants.Intake.PivotSetpoints.kStow;
-        break;
-      case HALF_STOW:
-        setSpeed = Constants.Intake.PivotSetpoints.kHalfStow;
-        break;
-      case INTAKE:
-        setSpeed = Constants.Intake.PivotSetpoints.kIntake;
-        break;
-      case EXTAKE:
-        setSpeed = Constants.Intake.PivotSetpoints.kExtake;
-        break;
-      case AGITATE:
-        setSpeed = Constants.Intake.PivotSetpoints.kAgitate;
-        break;
-      default:
-        return;
-    }
-    pivotSpeed = setSpeed;
-    m_pivot.set(setSpeed);
+  /** Set the pivot to a position setpoint in degrees using closed-loop control. */
+  private void setPivotPosition(double positionDeg) {
+    pivotSetpoint = positionDeg;
+    // Add feedforward boost when retracting (going up / toward 0)
+    double arbFf =
+        positionDeg < m_pivotEncoder.getPosition() ? Constants.Intake.kRetractFeedforward : 0.0;
+    m_pivotController.setSetpoint(
+        positionDeg, ControlType.kPosition, com.revrobotics.spark.ClosedLoopSlot.kSlot0, arbFf);
+  }
+
+  /** Returns true if the pivot is within tolerance of the current setpoint. */
+  public boolean pivotAtSetpoint() {
+    return Math.abs(m_pivotEncoder.getPosition() - pivotSetpoint)
+        < Constants.Intake.kPivotThreshold;
   }
 
   /** Stow pivot and stop all motors. */
   public void stopAll() {
-    setPivot(PivotSetpoints.STOW);
+    setPivotPosition(Constants.Intake.PivotSetpoints.kStow);
     setRollerSpeed(RollerSetpoints.STOP);
     setConveyorSpeed(ConveyorSetpoints.STOP);
   }
 
   public Command intakeCommand() {
-    return this.startEnd(
+    double rollerThreshold =
+        Constants.Intake.PivotSetpoints.kIntake * 0.3; // 30% of travel before rollers start
+    return this.run(
             () -> {
-              setPivot(PivotSetpoints.INTAKE);
-              setRollerSpeed(RollerSetpoints.INTAKE);
+              setPivotPosition(Constants.Intake.PivotSetpoints.kIntake);
               setConveyorSpeed(ConveyorSetpoints.INTAKE);
-            },
+              if (m_pivotEncoder.getPosition() >= rollerThreshold) {
+                setRollerSpeed(RollerSetpoints.INTAKE);
+              } else {
+                setRollerSpeed(RollerSetpoints.STOP);
+              }
+            })
+        .finallyDo(
             () -> {
               setRollerSpeed(RollerSetpoints.STOP);
               setConveyorSpeed(ConveyorSetpoints.STOP);
@@ -143,10 +143,7 @@ public class Intake extends SubsystemBase {
   }
 
   public Command deployIntake() {
-    return this.runOnce(
-        () -> {
-          setPivot(PivotSetpoints.INTAKE);
-        });
+    return this.runOnce(() -> setPivotPosition(Constants.Intake.PivotSetpoints.kIntake));
   }
 
   public Command conveyorCommand() {
@@ -154,19 +151,6 @@ public class Intake extends SubsystemBase {
             () -> setConveyorSpeed(ConveyorSetpoints.INTAKE),
             () -> setConveyorSpeed(ConveyorSetpoints.STOP))
         .withName("Conveyoring");
-  }
-
-  /** Half-stow pivot with rollers running. No subsystem claim. For use during prespin/shooting. */
-  public Command halfStowWithRollersCommand() {
-    return Commands.startEnd(
-            () -> {
-              setPivot(PivotSetpoints.HALF_STOW);
-              setRollerSpeed(RollerSetpoints.INTAKE);
-            },
-            () -> {
-              setRollerSpeed(RollerSetpoints.STOP);
-            })
-        .withName("HalfStowWithRollers");
   }
 
   /** Runs intake rollers without claiming Intake subsystem. For use in parallel with conveyor. */
@@ -180,7 +164,7 @@ public class Intake extends SubsystemBase {
   public Command extakeCommand() {
     return this.startEnd(
         () -> {
-          setPivot(PivotSetpoints.EXTAKE);
+          setPivotPosition(Constants.Intake.PivotSetpoints.kExtake);
           setRollerSpeed(RollerSetpoints.EXTAKE);
           setConveyorSpeed(ConveyorSetpoints.EXTAKE);
         },
@@ -196,7 +180,7 @@ public class Intake extends SubsystemBase {
 
     return this.runOnce(
             () -> {
-              setPivot(PivotSetpoints.STOW);
+              setPivotPosition(Constants.Intake.PivotSetpoints.kStow);
               setRollerSpeed(RollerSetpoints.INTAKE);
             })
         .andThen(Commands.waitSeconds(stowTime))
@@ -219,9 +203,12 @@ public class Intake extends SubsystemBase {
     for (int i = 0; i < count; i++) {
       agitation =
           agitation
-              .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.STOW)))
+              .andThen(
+                  Commands.runOnce(() -> setPivotPosition(Constants.Intake.PivotSetpoints.kStow)))
               .andThen(Commands.waitSeconds(stowTime))
-              .andThen(Commands.runOnce(() -> setPivot(PivotSetpoints.AGITATE)))
+              .andThen(
+                  Commands.runOnce(
+                      () -> setPivotPosition(Constants.Intake.PivotSetpoints.kAgitate)))
               .andThen(Commands.waitSeconds(deployTime));
     }
 
@@ -232,9 +219,30 @@ public class Intake extends SubsystemBase {
     return this.run(this::stopAll);
   }
 
+  /** Slowly drives pivot up until it stalls, then zeros the encoder. */
+  public Command zeroCommand() {
+    return this.run(
+            () -> {
+              setRollerSpeed(RollerSetpoints.STOP);
+              setConveyorSpeed(ConveyorSetpoints.STOP);
+              m_pivot.set(Constants.Intake.kZeroSpeed);
+            })
+        .until(() -> Math.abs(m_pivotEncoder.getVelocity()) < 1.0)
+        .andThen(
+            this.runOnce(
+                () -> {
+                  m_pivot.stopMotor();
+                  m_pivotEncoder.setPosition(0);
+                  pivotSetpoint = 0;
+                }))
+        .withName("ZeroIntake");
+  }
+
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSpeed);
+    SmartDashboard.putNumber("Intake/Pivot/Position", m_pivotEncoder.getPosition());
+    SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
+    SmartDashboard.putBoolean("Intake/Pivot/At Setpoint", pivotAtSetpoint());
   }
 
   public void simulationPeriodic() {
