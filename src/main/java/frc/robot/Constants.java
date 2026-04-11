@@ -109,10 +109,13 @@ public final class Constants {
     public static final int kConveyorCanId = 4; // change later
     public static final int kPivotCanId = 17;
 
-    public static final double kPivotReduction = 1;
-    public static final double kPivotThreshold = 2.0;
+    public static final double kPivotReduction = 25; // TODO: set to actual gear reduction
+    public static final double kPivotThreshold = 1.0; // degrees tolerance for at-setpoint
 
-    public static final double kP = 0.06;
+    public static final double kP = 0.0022; // TODO: tune
+    public static final double kD = 0.0;
+    public static final double kRetractFeedforward = -0.65; // extra power when going up (tune)
+    public static final double kZeroSpeed = -0.35; // slow speed for zeroing (going up)
 
     public static final class RollerSetpoints {
       public static final double kIntake = -1;
@@ -126,13 +129,14 @@ public final class Constants {
       public static final double kStop = 0;
     }
 
+    // Setpoints in degrees of output shaft rotation. 0 = stowed (all the way up at boot).
+    // Positive = deploy down. TODO: tune all values on the robot.
     public static final class PivotSetpoints {
-      // No encoder so use m_pivot.set(PivotSetpoints.WHATEVER)
-      public static final double kStow = -0.3;
-      public static final double kHalfStow = kStow / 2.0;
-      public static final double kIntake = 0.3;
-      public static final double kExtake = 0.3;
-      public static final double kAgitate = 0.14;
+      public static final double kStow = 0.0;
+
+      public static final double kIntake = 271.14;
+      public static final double kExtake = 271.14;
+      public static final double kAgitate = 200.0;
     }
 
     public static final class AgitatorConstants {

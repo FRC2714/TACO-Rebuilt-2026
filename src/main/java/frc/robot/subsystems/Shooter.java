@@ -104,17 +104,17 @@ public class Shooter extends SubsystemBase {
   static {
     shooterMap.put(1.626, new ShooterParams(1850, 0.89));
     shooterMap.put(2.68, new ShooterParams(2400, 1.09));
-    shooterMap.put(2.9464, new ShooterParams(2400, 1.27));
-    shooterMap.put(3.17, new ShooterParams(2575, 1.2));
-    shooterMap.put(3.4, new ShooterParams(2600, 1.2));
-    shooterMap.put(4.2, new ShooterParams(2900, 1.3));
-    shooterMap.put(4.5, new ShooterParams(3000, 1.3));
-    shooterMap.put(4.65, new ShooterParams(3150, 1.4));
-    shooterMap.put(5.2, new ShooterParams(3500, 1.4));
-    shooterMap.put(6.0, new ShooterParams(4000, 1.5));
-    shooterMap.put(7.0, new ShooterParams(4600, 1.6));
+    shooterMap.put(2.9464, new ShooterParams(2550, 1.27));
+    shooterMap.put(3.17, new ShooterParams(2700, 1.2));
+    shooterMap.put(3.4, new ShooterParams(2800, 1.2));
+    shooterMap.put(4.2, new ShooterParams(3250, 1.3));
+    shooterMap.put(4.5, new ShooterParams(3450, 1.3));
+    shooterMap.put(4.65, new ShooterParams(3600, 1.4));
+    shooterMap.put(5.2, new ShooterParams(3750, 1.4));
+    shooterMap.put(6.0, new ShooterParams(4300, 1.5));
+    shooterMap.put(7.0, new ShooterParams(4650, 1.6));
     shooterMap.put(8.0, new ShooterParams(5200, 1.7));
-    shooterMap.put(9.0, new ShooterParams(5800, 1.8));
+    shooterMap.put(9.0, new ShooterParams(5900, 1.8));
   }
 
   public void calculate(
