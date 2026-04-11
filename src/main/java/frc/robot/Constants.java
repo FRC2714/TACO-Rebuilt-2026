@@ -195,11 +195,12 @@ public final class Constants {
     public static final double kFlywheelDebounceTimeSeconds = 0.1;
     public static final double kLatencyCompensation = 0.1; // seconds
     public static final double kRpmScaleFactor = 0.9; // Scale all lookup RPMs down (tune this)
-    public static final double kRpmPerMpsRadial = 100.0; // RPM per m/s moving away from hub (tune)
+    public static final double kRpmPerMpsRadial = 62.0; // RPM per m/s moving away from hub (tune)
     public static final double kRpmPerMpsLateral = 75.0; // RPM per m/s moving sideways (tune)
+    public static final double kUnjamDuration = 0.5; // seconds to reverse feeder before shooting
 
     public static final class FeederSetpoints {
-      public static final double kFeed = 0.95;
+      public static final double kFeed = 1;
     }
 
     public static final class FlywheelSetpoints {

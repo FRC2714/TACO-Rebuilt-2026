@@ -103,9 +103,9 @@ public class Shooter extends SubsystemBase {
 
   static {
     shooterMap.put(1.626, new ShooterParams(1850, 0.89));
-    shooterMap.put(2.68, new ShooterParams(2400, 1.09));
+    shooterMap.put(2.68, new ShooterParams(2375, 1.09));
     shooterMap.put(2.9464, new ShooterParams(2550, 1.27));
-    shooterMap.put(3.17, new ShooterParams(2630, 1.2));
+    shooterMap.put(3.17, new ShooterParams(2600, 1.2));
     shooterMap.put(3.4, new ShooterParams(2800, 1.2));
     shooterMap.put(4.2, new ShooterParams(3250, 1.3));
     shooterMap.put(4.5, new ShooterParams(3450, 1.3));
@@ -184,8 +184,25 @@ public class Shooter extends SubsystemBase {
 
   /** Spin up flywheel, then run feeder once at speed. Uses calculatedRpm (updates every cycle). */
   public Command runShooterCommand() {
+    // Reverse feeder briefly to normalize ball positions while flywheel spins up.
+    // Ends early if flywheel reaches speed before 0.5s.
+    Command unjam =
+        this.run(
+                () -> {
+                  this.setFlywheelVelocity(calculatedRpm);
+                  this.setFeederPower(-FeederSetpoints.kFeed);
+                })
+            .until(isFlywheelSpinning)
+            .withTimeout(ShooterConstants.kUnjamDuration)
+            .withName("Unjam");
+
+    // Continue spinning up (feeder stopped) if flywheel isn't ready yet after unjam
     Command spinUntilUp =
-        this.run(() -> this.setFlywheelVelocity(calculatedRpm))
+        this.run(
+                () -> {
+                  this.setFlywheelVelocity(calculatedRpm);
+                  this.setFeederPower(0);
+                })
             .until(isFlywheelSpinning)
             .withName("SpinUntilUp");
 
@@ -198,7 +215,11 @@ public class Shooter extends SubsystemBase {
             .finallyDo(this::stopAll)
             .withName("FeederPhase");
 
-    return spinUntilUp.andThen(feederPhase).withName("Shooting");
+    return unjam.andThen(spinUntilUp).andThen(feederPhase).withName("Shooting");
+  }
+
+  public Trigger getIsFlywheelSpinning() {
+    return isFlywheelSpinning;
   }
 
   /** Spin up flywheel using calculatedRpm (no auto-align override), then run feeder. */
