@@ -33,12 +33,6 @@
           "data": {
             "pathName": "O-Intake AGAIN NZ + Score"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SCORE_NZ"
-          }
         }
       ]
     }
