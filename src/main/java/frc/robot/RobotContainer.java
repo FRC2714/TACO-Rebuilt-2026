@@ -45,11 +45,24 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    NamedCommands.registerCommand("SCORE", m_superstructure.shooterSequence(true).withTimeout(3.5));
     NamedCommands.registerCommand(
-        "SCORE_NO_AGITATE", m_superstructure.shooterSequence(false).withTimeout(2.55));
+        "SCORE",
+        m_superstructure
+            .shooterSequence(true)
+            .alongWith(new RunCommand(() -> m_robotDrive.drive(0, 0, 0, true), m_robotDrive))
+            .withTimeout(3.5));
     NamedCommands.registerCommand(
-        "SCORE_NZ", m_superstructure.shooterSequence(true, .5, 0.85, 0.5, 1).withTimeout(6.5));
+        "SCORE_NO_AGITATE",
+        m_superstructure
+            .shooterSequence(false)
+            .alongWith(new RunCommand(() -> m_robotDrive.drive(0, 0, 0, true), m_robotDrive))
+            .withTimeout(2.55));
+    NamedCommands.registerCommand(
+        "SCORE_NZ",
+        m_superstructure
+            .shooterSequence(true, .5, 0.85, 0.5, 1)
+            .alongWith(new RunCommand(() -> m_robotDrive.drive(0, 0, 0, true), m_robotDrive))
+            .withTimeout(6.5));
     NamedCommands.registerCommand("INTAKE", m_intake.intakeCommand().withTimeout(2.5));
     NamedCommands.registerCommand("INTAKE_NZ", m_intake.intakeCommand().withTimeout(8.25));
     NamedCommands.registerCommand("DEPLOY_INTAKE", m_intake.deployIntake());

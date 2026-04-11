@@ -105,7 +105,7 @@ public class Shooter extends SubsystemBase {
     shooterMap.put(1.626, new ShooterParams(1850, 0.89));
     shooterMap.put(2.68, new ShooterParams(2400, 1.09));
     shooterMap.put(2.9464, new ShooterParams(2550, 1.27));
-    shooterMap.put(3.17, new ShooterParams(2700, 1.2));
+    shooterMap.put(3.17, new ShooterParams(2630, 1.2));
     shooterMap.put(3.4, new ShooterParams(2800, 1.2));
     shooterMap.put(4.2, new ShooterParams(3250, 1.3));
     shooterMap.put(4.5, new ShooterParams(3450, 1.3));
