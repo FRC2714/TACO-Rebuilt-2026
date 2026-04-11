@@ -76,7 +76,15 @@ public class Superstructure extends SubsystemBase {
                 : new ParallelCommandGroup(
                     m_intake.conveyorCommand(), m_intake.shootingRollerCommand()));
 
-    ParallelCommandGroup group = new ParallelCommandGroup(m_shooter.runShooterCommand(), feedGroup);
+    // Reverse conveyor during unjam phase, ends when flywheel spins up or unjam timeout
+    Command unjamConveyor =
+        m_intake
+            .reverseConveyorCommand()
+            .until(() -> m_shooter.isFlywheelSpinning.getAsBoolean())
+            .withTimeout(ShooterConstants.kUnjamDuration);
+
+    ParallelCommandGroup group =
+        new ParallelCommandGroup(m_shooter.runShooterCommand(), unjamConveyor, feedGroup);
 
     return group
         .beforeStarting(
