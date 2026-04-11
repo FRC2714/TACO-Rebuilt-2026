@@ -76,21 +76,15 @@ public class Superstructure extends SubsystemBase {
                 : new ParallelCommandGroup(
                     m_intake.conveyorCommand(), m_intake.shootingRollerCommand()));
 
-    ParallelCommandGroup group;
-    if (align) {
-      group =
-          new ParallelCommandGroup(
-              m_shooter.runShooterCommand(),
-              m_driveSubsystem.run(() -> m_driveSubsystem.drive(0, 0, 0, true)),
-              feedGroup);
-    } else {
-      group = new ParallelCommandGroup(m_shooter.runShooterCommand(), feedGroup);
-    }
+    ParallelCommandGroup group = new ParallelCommandGroup(m_shooter.runShooterCommand(), feedGroup);
 
     return group
         .beforeStarting(
             () -> {
-              if (align) m_driveSubsystem.setAligning(true);
+              if (align) {
+                m_driveSubsystem.setAligning(true);
+                m_driveSubsystem.setShooting(true);
+              }
             })
         .finallyDo(interrupted -> stowAll());
   }
@@ -252,8 +246,12 @@ public class Superstructure extends SubsystemBase {
         m_shooter.getCalculatedHeadingDeg()
             + frc.robot.Constants.AutoAlignConstants.kRotationOffsetDeg);
 
-    // Auto pre-spin: keep flywheel hot when hub is active and we're in alliance zone
-    boolean shouldPreSpin = hubActive && inAllianceZone && DriverStation.isTeleopEnabled();
+    // Auto pre-spin: only if hub active, in alliance zone, teleop, and intaked recently
+    boolean shouldPreSpin =
+        hubActive
+            && inAllianceZone
+            && DriverStation.isTeleopEnabled()
+            && m_intake.hasIntakedRecently(6.0);
     m_shooter.setAutoPreSpin(shouldPreSpin);
     SmartDashboard.putBoolean("Match/Auto PreSpin", shouldPreSpin);
   }
