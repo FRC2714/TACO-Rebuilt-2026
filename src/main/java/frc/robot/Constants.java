@@ -112,10 +112,10 @@ public final class Constants {
     public static final double kPivotReduction = 25; // TODO: set to actual gear reduction
     public static final double kPivotThreshold = 1.0; // degrees tolerance for at-setpoint
 
-    public static final double kP = 0.002; // TODO: tune
+    public static final double kP = 0.0022; // TODO: tune
     public static final double kD = 0.0;
-    public static final double kRetractFeedforward = -0.6; // extra power when going up (tune)
-    public static final double kZeroSpeed = -0.32; // slow speed for zeroing (going up)
+    public static final double kRetractFeedforward = -0.65; // extra power when going up (tune)
+    public static final double kZeroSpeed = -0.35; // slow speed for zeroing (going up)
 
     public static final class RollerSetpoints {
       public static final double kIntake = -1;
@@ -136,7 +136,7 @@ public final class Constants {
 
       public static final double kIntake = 271.14;
       public static final double kExtake = 271.14;
-      public static final double kAgitate = 30.0;
+      public static final double kAgitate = 200.0;
     }
 
     public static final class AgitatorConstants {
