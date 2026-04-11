@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkSim;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,6 +30,12 @@ public class Intake extends SubsystemBase {
   private SparkSim conveyorSim;
 
   private double pivotSetpoint = Constants.Intake.PivotSetpoints.kStow;
+  private double lastIntakeTimestamp = 0.0;
+
+  // Discovered setpoints from zeroing — default to constants, overwritten by zeroCommand
+  private double stowPosition = Constants.Intake.PivotSetpoints.kStow;
+  private double intakePosition = Constants.Intake.PivotSetpoints.kIntake;
+  private boolean zeroing = false;
 
   private enum RollerSetpoints {
     INTAKE,
@@ -114,26 +121,38 @@ public class Intake extends SubsystemBase {
         < Constants.Intake.kPivotThreshold;
   }
 
+  /** Returns true if the intake command was used within the last given seconds. */
+  public boolean hasIntakedRecently(double seconds) {
+    return Timer.getFPGATimestamp() - lastIntakeTimestamp < seconds;
+  }
+
   /** Stow pivot and stop all motors. */
   public void stopAll() {
-    setPivotPosition(Constants.Intake.PivotSetpoints.kStow);
+    setPivotPosition(stowPosition);
     setRollerSpeed(RollerSetpoints.STOP);
     setConveyorSpeed(ConveyorSetpoints.STOP);
   }
 
   public Command intakeCommand() {
-    double rollerThreshold =
-        Constants.Intake.PivotSetpoints.kIntake * 0.3; // 30% of travel before rollers start
-    return this.run(
+    return this.runOnce(
             () -> {
-              setPivotPosition(Constants.Intake.PivotSetpoints.kIntake);
+              setPivotPosition(intakePosition);
+              setRollerSpeed(RollerSetpoints.STOP);
               setConveyorSpeed(ConveyorSetpoints.INTAKE);
-              if (m_pivotEncoder.getPosition() >= rollerThreshold) {
-                setRollerSpeed(RollerSetpoints.INTAKE);
-              } else {
-                setRollerSpeed(RollerSetpoints.STOP);
-              }
+              lastIntakeTimestamp = Timer.getFPGATimestamp();
             })
+        .andThen(
+            Commands.waitUntil(
+                () ->
+                    m_pivotEncoder.getPosition()
+                        >= stowPosition + (intakePosition - stowPosition) * 0.3))
+        .andThen(
+            this.run(
+                () -> {
+                  setPivotPosition(intakePosition);
+                  setRollerSpeed(RollerSetpoints.INTAKE);
+                  setConveyorSpeed(ConveyorSetpoints.INTAKE);
+                }))
         .finallyDo(
             () -> {
               setRollerSpeed(RollerSetpoints.STOP);
@@ -143,7 +162,7 @@ public class Intake extends SubsystemBase {
   }
 
   public Command deployIntake() {
-    return this.runOnce(() -> setPivotPosition(Constants.Intake.PivotSetpoints.kIntake));
+    return this.runOnce(() -> setPivotPosition(intakePosition));
   }
 
   public Command conveyorCommand() {
@@ -164,7 +183,7 @@ public class Intake extends SubsystemBase {
   public Command extakeCommand() {
     return this.startEnd(
         () -> {
-          setPivotPosition(Constants.Intake.PivotSetpoints.kExtake);
+          setPivotPosition(intakePosition);
           setRollerSpeed(RollerSetpoints.EXTAKE);
           setConveyorSpeed(ConveyorSetpoints.EXTAKE);
         },
@@ -219,23 +238,58 @@ public class Intake extends SubsystemBase {
     return this.run(this::stopAll);
   }
 
-  /** Slowly drives pivot up until it stalls, then zeros the encoder. */
+  /**
+   * Full zeroing sequence: drives pivot down until stall (sets intake setpoint), then drives up
+   * until stall (sets stow setpoint and zeros encoder). Blocks all other intake commands while
+   * running.
+   */
   public Command zeroCommand() {
-    return this.run(
-            () -> {
-              setRollerSpeed(RollerSetpoints.STOP);
-              setConveyorSpeed(ConveyorSetpoints.STOP);
-              m_pivot.set(Constants.Intake.kZeroSpeed);
-            })
-        .until(() -> Math.abs(m_pivotEncoder.getVelocity()) < 1.0)
-        .andThen(
-            this.runOnce(
+    // Phase 1: drive down to find intake position
+    Command driveDown =
+        this.runOnce(
                 () -> {
-                  m_pivot.stopMotor();
-                  m_pivotEncoder.setPosition(0);
-                  pivotSetpoint = 0;
-                }))
+                  zeroing = true;
+                  setRollerSpeed(RollerSetpoints.STOP);
+                  setConveyorSpeed(ConveyorSetpoints.STOP);
+                  m_pivot.set(-Constants.Intake.kZeroSpeed);
+                })
+            .andThen(Commands.waitSeconds(0.5))
+            .andThen(
+                this.run(() -> m_pivot.set(-Constants.Intake.kZeroSpeed))
+                    .until(() -> Math.abs(m_pivotEncoder.getVelocity()) < 1.0))
+            .andThen(
+                this.runOnce(
+                    () -> {
+                      m_pivot.stopMotor();
+                      intakePosition = m_pivotEncoder.getPosition();
+                    }));
+
+    // Phase 2: drive up to find stow position and zero encoder
+    Command driveUp =
+        this.runOnce(() -> m_pivot.set(Constants.Intake.kZeroSpeed))
+            .andThen(Commands.waitSeconds(0.5))
+            .andThen(
+                this.run(() -> m_pivot.set(Constants.Intake.kZeroSpeed))
+                    .until(() -> Math.abs(m_pivotEncoder.getVelocity()) < 1.0))
+            .andThen(
+                this.runOnce(
+                    () -> {
+                      m_pivot.stopMotor();
+                      m_pivotEncoder.setPosition(0);
+                      stowPosition = 0.0;
+                      pivotSetpoint = 0;
+                      zeroing = false;
+                    }));
+
+    return driveDown
+        .andThen(Commands.waitSeconds(0.2))
+        .andThen(driveUp)
+        .finallyDo(() -> zeroing = false)
         .withName("ZeroIntake");
+  }
+
+  public boolean isZeroing() {
+    return zeroing;
   }
 
   @Override
@@ -243,6 +297,8 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Pivot/Position", m_pivotEncoder.getPosition());
     SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint", pivotAtSetpoint());
+    SmartDashboard.putNumber("Intake/Pivot/Stow Position", stowPosition);
+    SmartDashboard.putNumber("Intake/Pivot/Intake Position", intakePosition);
   }
 
   public void simulationPeriodic() {
