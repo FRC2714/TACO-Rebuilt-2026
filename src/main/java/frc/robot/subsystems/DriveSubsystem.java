@@ -253,9 +253,9 @@ public class DriveSubsystem extends SubsystemBase {
       rotDelivered = alignRotSpeed;
     }
 
-    // X-lock when shooting and stationary for defense resistance
+    // X-lock when shooting, stationary, and already aligned for defense resistance
     boolean driverStationary = Math.abs(xSpeed) < 0.05 && Math.abs(ySpeed) < 0.05;
-    if (shooting && driverStationary) {
+    if (shooting && driverStationary && isAligned()) {
       setX();
       return;
     }

@@ -76,21 +76,15 @@ public class Superstructure extends SubsystemBase {
                 : new ParallelCommandGroup(
                     m_intake.conveyorCommand(), m_intake.shootingRollerCommand()));
 
-    ParallelCommandGroup group;
-    if (align) {
-      group =
-          new ParallelCommandGroup(
-              m_shooter.runShooterCommand(),
-              m_driveSubsystem.run(() -> m_driveSubsystem.drive(0, 0, 0, true)),
-              feedGroup);
-    } else {
-      group = new ParallelCommandGroup(m_shooter.runShooterCommand(), feedGroup);
-    }
+    ParallelCommandGroup group = new ParallelCommandGroup(m_shooter.runShooterCommand(), feedGroup);
 
     return group
         .beforeStarting(
             () -> {
-              if (align) m_driveSubsystem.setAligning(true);
+              if (align) {
+                m_driveSubsystem.setAligning(true);
+                m_driveSubsystem.setShooting(true);
+              }
             })
         .finallyDo(interrupted -> stowAll());
   }
