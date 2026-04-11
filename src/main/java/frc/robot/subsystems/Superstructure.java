@@ -252,8 +252,12 @@ public class Superstructure extends SubsystemBase {
         m_shooter.getCalculatedHeadingDeg()
             + frc.robot.Constants.AutoAlignConstants.kRotationOffsetDeg);
 
-    // Auto pre-spin: keep flywheel hot when hub is active and we're in alliance zone
-    boolean shouldPreSpin = hubActive && inAllianceZone && DriverStation.isTeleopEnabled();
+    // Auto pre-spin: only if hub active, in alliance zone, teleop, and intaked recently
+    boolean shouldPreSpin =
+        hubActive
+            && inAllianceZone
+            && DriverStation.isTeleopEnabled()
+            && m_intake.hasIntakedRecently(6.0);
     m_shooter.setAutoPreSpin(shouldPreSpin);
     SmartDashboard.putBoolean("Match/Auto PreSpin", shouldPreSpin);
   }
