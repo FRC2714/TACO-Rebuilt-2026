@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.273,
-        "y": 2.243
+        "x": 2.525235378031383,
+        "y": 2.3853209700427964
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2462266924670167,
-        "y": 2.3345252364702187
+        "x": 3.4984620704983995,
+        "y": 2.4768462065130152
       },
       "isLocked": false,
       "linkedName": "O-intake-NZ"
@@ -143,7 +143,7 @@
   "folder": "Outpost Preload to NZ",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 43.727
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

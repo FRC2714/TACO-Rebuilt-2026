@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.628744650499286,
-        "y": 5.82700427960057
+        "x": 2.525235378031383,
+        "y": 5.684679029957204
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.5905706134094157,
-        "y": 5.82700427960057
+        "x": 3.4984620704983995,
+        "y": 5.593153793486985
       },
       "isLocked": false,
       "linkedName": "D-intake-NZ"
@@ -20,12 +20,12 @@
         "y": 5.581169757489301
       },
       "prevControl": {
-        "x": 5.953980028530669,
-        "y": 6.094819855915555
+        "x": 5.524559321602273,
+        "y": 6.274880376561392
       },
       "nextControl": {
-        "x": 5.953980028530669,
-        "y": 5.115378031383737
+        "x": 6.28863541485182,
+        "y": 5.040548423969475
       },
       "isLocked": false,
       "linkedName": null
@@ -33,43 +33,43 @@
     {
       "anchor": {
         "x": 5.953980028530669,
-        "y": 3.666248216833096
+        "y": 4.300242510699001
       },
       "prevControl": {
-        "x": 5.582973487719318,
-        "y": 3.580631322799707
+        "x": 5.603858528202338,
+        "y": 4.815210729678513
       },
       "nextControl": {
-        "x": 6.794992867332382,
-        "y": 3.860328102710414
+        "x": 6.4599215632266676,
+        "y": 3.556089949985561
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.539942938659058,
-        "y": 5.57
+        "x": 7.118459343794578,
+        "y": 4.973052781740369
       },
       "prevControl": {
-        "x": 5.966918687589157,
-        "y": 5.362981455064194
+        "x": 7.57356966224922,
+        "y": 4.249668499257926
       },
       "nextControl": {
-        "x": 5.069010046224987,
-        "y": 5.798331099361975
+        "x": 6.419909214181094,
+        "y": 6.083377386122705
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.1,
-        "y": 5.57
+        "x": 3.029843081312411,
+        "y": 5.581169757489301
       },
       "prevControl": {
-        "x": 3.8,
-        "y": 5.62
+        "x": 5.876494837661792,
+        "y": 5.582379779368663
       },
       "nextControl": null,
       "isLocked": false,
@@ -83,26 +83,26 @@
     },
     {
       "waypointRelativePos": 1.0,
-      "rotationDegrees": -90.0
+      "rotationDegrees": -87.36772299341065
     },
     {
       "waypointRelativePos": 2.0,
-      "rotationDegrees": -90.0
+      "rotationDegrees": -80.27242144859835
     },
     {
-      "waypointRelativePos": 3.0,
-      "rotationDegrees": -90.0
+      "waypointRelativePos": 2.4989339019189676,
+      "rotationDegrees": 61.534967198111204
     },
     {
-      "waypointRelativePos": 3.5,
-      "rotationDegrees": -43.727
+      "waypointRelativePos": 3.14712153518124,
+      "rotationDegrees": 144.90079190784365
     }
   ],
   "constraintZones": [
     {
       "name": "BUMP",
-      "minWaypointRelativePos": 0.3,
-      "maxWaypointRelativePos": 0.8,
+      "minWaypointRelativePos": 0.3349088453747461,
+      "maxWaypointRelativePos": 0.6698176907494909,
       "constraints": {
         "maxVelocity": 2.5,
         "maxAcceleration": 2.0,
@@ -117,23 +117,12 @@
   "eventMarkers": [
     {
       "name": "INTAKE_NZ",
-      "waypointRelativePos": 0.49696151249155024,
+      "waypointRelativePos": 0.6914247130317296,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
           "name": "INTAKE_NZ"
-        }
-      }
-    },
-    {
-      "name": "PRESPIN",
-      "waypointRelativePos": 3.3,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "PRESPIN"
         }
       }
     }
@@ -148,13 +137,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -43.727
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": "Depot Preload to NZ",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -43.727
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

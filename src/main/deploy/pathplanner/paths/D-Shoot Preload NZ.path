@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4697574893009984,
-        "y": 5.930513552068473
+        "x": 3.560328102710413,
+        "y": 6.072838801711839
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1474712349624947,
-        "y": 5.722375658405624
+        "x": 3.2208568931121713,
+        "y": 5.879438435519371
       },
       "isLocked": false,
       "linkedName": "start-position-NZ"
@@ -20,8 +20,8 @@
         "y": 5.775249643366619
       },
       "prevControl": {
-        "x": 3.527785913551807,
-        "y": 5.825532681113193
+        "x": 3.3456288857690426,
+        "y": 5.805312039518563
       },
       "nextControl": null,
       "isLocked": false,
@@ -54,7 +54,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -50.792796495032114
+    "rotation": -49.1849161251184
   },
   "reversed": false,
   "folder": "Depot Preload to NZ",

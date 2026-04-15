@@ -96,12 +96,12 @@
     },
     {
       "anchor": {
-        "x": 2.273,
-        "y": 2.243
+        "x": 2.525235378031383,
+        "y": 2.3853209700427964
       },
       "prevControl": {
-        "x": 3.935549215406562,
-        "y": 2.6570328102710414
+        "x": 4.187784593437945,
+        "y": 2.799353780313838
       },
       "nextControl": null,
       "isLocked": false,
@@ -199,7 +199,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 43.727
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": "Outpost Preload to NZ",
