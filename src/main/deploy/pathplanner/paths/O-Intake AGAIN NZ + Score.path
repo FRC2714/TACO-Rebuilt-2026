@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.706376604850214,
-        "y": 2.4888302425106996
+        "x": 2.273,
+        "y": 2.243
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.5905706134094157,
-        "y": 2.4888302425106996
+        "x": 3.2462266924670167,
+        "y": 2.3345252364702187
       },
       "isLocked": false,
       "linkedName": "O-intake-NZ"
@@ -20,12 +20,12 @@
         "y": 2.4888302425106996
       },
       "prevControl": {
-        "x": 5.914584864329573,
-        "y": 1.976693107896474
+        "x": 5.524559321602273,
+        "y": 1.795119623438608
       },
       "nextControl": {
-        "x": 5.9927960057061345,
-        "y": 2.993437945791726
+        "x": 6.28863541485182,
+        "y": 3.0294515760305245
       },
       "isLocked": false,
       "linkedName": null
@@ -33,43 +33,43 @@
     {
       "anchor": {
         "x": 5.953980028530669,
-        "y": 4.326119828815978
+        "y": 3.9897146932952925
       },
       "prevControl": {
-        "x": 5.75690424516352,
-        "y": 4.129044045448829
+        "x": 5.603858528202338,
+        "y": 3.4747464743157805
       },
       "nextControl": {
-        "x": 6.458587731811697,
-        "y": 4.830727532097005
+        "x": 6.4599215632266676,
+        "y": 4.733867254008732
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.558373751783167,
-        "y": 4.080285306704707
+        "x": 7.144336661911555,
+        "y": 3.3557203994293876
       },
       "prevControl": {
-        "x": 7.28666191155492,
-        "y": 4.817788873038516
+        "x": 7.599446980366197,
+        "y": 4.079104681911831
       },
       "nextControl": {
-        "x": 7.706680868841123,
-        "y": 3.6777374175473994
+        "x": 6.4457865322980705,
+        "y": 2.245395795047052
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.428987161198288,
-        "y": 2.126547788873039
+        "x": 3.029843081312411,
+        "y": 2.4888302425106996
       },
       "prevControl": {
-        "x": 7.830085592011412,
-        "y": 2.3982596291012848
+        "x": 5.876494837661792,
+        "y": 2.487620220631337
       },
       "nextControl": null,
       "isLocked": false,
@@ -87,18 +87,22 @@
     },
     {
       "waypointRelativePos": 2.0,
-      "rotationDegrees": 90.0
+      "rotationDegrees": 80.27242144859835
     },
     {
-      "waypointRelativePos": 3.1,
-      "rotationDegrees": -84.83480826924476
+      "waypointRelativePos": 2.4989339019189676,
+      "rotationDegrees": -61.534967198111204
+    },
+    {
+      "waypointRelativePos": 3.14712153518124,
+      "rotationDegrees": -144.90079190784365
     }
   ],
   "constraintZones": [
     {
       "name": "BUMP",
-      "minWaypointRelativePos": 0.3,
-      "maxWaypointRelativePos": 0.8,
+      "minWaypointRelativePos": 0.3349088453747461,
+      "maxWaypointRelativePos": 0.6698176907494909,
       "constraints": {
         "maxVelocity": 2.5,
         "maxAcceleration": 2.0,
@@ -133,7 +137,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -95.52754015165617
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": "Outpost Preload to NZ",
