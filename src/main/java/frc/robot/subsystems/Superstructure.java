@@ -38,6 +38,14 @@ public class Superstructure extends SubsystemBase {
     m_driveSubsystem.setShooting(false);
   }
 
+  /** Cleanup after shooting but leave intake deployed. */
+  private void stowAllDeployed() {
+    m_shooter.stopAll();
+    m_intake.stopAllDeployed();
+    m_driveSubsystem.setAligning(false);
+    m_driveSubsystem.setShooting(false);
+  }
+
   public Command stowCommand() {
     return Commands.runOnce(this::stowAll).withName("StowAll");
   }
@@ -86,7 +94,7 @@ public class Superstructure extends SubsystemBase {
                 m_driveSubsystem.setShooting(true);
               }
             })
-        .finallyDo(interrupted -> stowAll());
+        .finallyDo(interrupted -> stowAllDeployed());
   }
 
   public Command passingSequence() {

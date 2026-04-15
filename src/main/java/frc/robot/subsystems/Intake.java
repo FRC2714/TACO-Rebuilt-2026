@@ -133,6 +133,13 @@ public class Intake extends SubsystemBase {
     setConveyorSpeed(ConveyorSetpoints.STOP);
   }
 
+  /** Stop rollers/conveyor but leave intake deployed at intake position. */
+  public void stopAllDeployed() {
+    setPivotPosition(intakePosition);
+    setRollerSpeed(RollerSetpoints.STOP);
+    setConveyorSpeed(ConveyorSetpoints.STOP);
+  }
+
   public Command intakeCommand() {
     return this.runOnce(
             () -> {
