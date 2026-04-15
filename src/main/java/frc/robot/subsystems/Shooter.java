@@ -193,25 +193,8 @@ public class Shooter extends SubsystemBase {
 
   /** Spin up flywheel, then run feeder once at speed. Uses calculatedRpm (updates every cycle). */
   public Command runShooterCommand() {
-    // Reverse feeder briefly to normalize ball positions while flywheel spins up.
-    // Ends early if flywheel reaches speed before 0.5s.
-    Command unjam =
-        this.run(
-                () -> {
-                  this.setFlywheelVelocity(calculatedRpm);
-                  this.setFeederPower(-FeederSetpoints.kFeed);
-                })
-            .until(isFlywheelSpinning)
-            .withTimeout(ShooterConstants.kUnjamDuration)
-            .withName("Unjam");
-
-    // Continue spinning up (feeder stopped) if flywheel isn't ready yet after unjam
     Command spinUntilUp =
-        this.run(
-                () -> {
-                  this.setFlywheelVelocity(calculatedRpm);
-                  this.setFeederPower(0);
-                })
+        this.run(() -> this.setFlywheelVelocity(calculatedRpm))
             .until(isFlywheelSpinning)
             .withName("SpinUntilUp");
 
@@ -224,7 +207,7 @@ public class Shooter extends SubsystemBase {
             .finallyDo(this::stopAll)
             .withName("FeederPhase");
 
-    return unjam.andThen(spinUntilUp).andThen(feederPhase).withName("Shooting");
+    return spinUntilUp.andThen(feederPhase).withName("Shooting");
   }
 
   public Trigger getIsFlywheelSpinning() {
