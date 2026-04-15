@@ -62,7 +62,13 @@ public class RobotContainer {
         m_superstructure
             .shooterSequence(true, .5, 0.85, 0.5, 1)
             .alongWith(new RunCommand(() -> m_robotDrive.drive(0, 0, 0, true), m_robotDrive))
-            .withTimeout(6.5));
+            .withTimeout(4.5));
+    NamedCommands.registerCommand(
+        "SCORE_NZ_SMALL",
+        m_superstructure
+            .shooterSequence(true, .5, 0.85, 0.5, 1)
+            .alongWith(new RunCommand(() -> m_robotDrive.drive(0, 0, 0, true), m_robotDrive))
+            .withTimeout(3.25));
     NamedCommands.registerCommand("INTAKE", m_intake.intakeCommand().withTimeout(2.5));
     NamedCommands.registerCommand("INTAKE_NZ", m_intake.intakeCommand().withTimeout(8.25));
     NamedCommands.registerCommand("DEPLOY_INTAKE", m_intake.deployIntake());
