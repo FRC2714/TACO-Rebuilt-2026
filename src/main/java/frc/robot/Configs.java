@@ -109,7 +109,7 @@ public final class Configs {
       flywheelConfig
           .inverted(true)
           .idleMode(IdleMode.kCoast)
-          .closedLoopRampRate(1.0)
+          .closedLoopRampRate(0.3)
           .openLoopRampRate(1.0)
           .smartCurrentLimit(80);
 
@@ -121,8 +121,10 @@ public final class Configs {
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Set PID values for position control
-          .p(0.0002)
+          .p(0.00055)
           .outputRange(-1, 1);
+
+      flywheelConfig.encoder.quadratureMeasurementPeriod(10).quadratureAverageDepth(4);
 
       //   flywheelConfig
       //       .closedLoop
@@ -134,7 +136,7 @@ public final class Configs {
 
       // Constants.NeoMotorConstants.kVortexKv is in rpm/V. feedforward.kV is in V/rpm sort we take
       // the reciprocol.
-      flywheelConfig.closedLoop.feedForward.kV(.0018);
+      flywheelConfig.closedLoop.feedForward.kV(.00182);
 
       //   flywheelConfig.encoder.velocityConversionFactor(34./46.);
 
