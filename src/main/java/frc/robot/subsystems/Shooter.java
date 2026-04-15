@@ -103,14 +103,15 @@ public class Shooter extends SubsystemBase {
 
   static {
     shooterMap.put(1.626, new ShooterParams(1850, 0.89));
-    shooterMap.put(2.68, new ShooterParams(2400, 1.09));
-    shooterMap.put(2.9464, new ShooterParams(2550, 1.27));
-    shooterMap.put(3.17, new ShooterParams(2700, 1.2));
-    shooterMap.put(3.4, new ShooterParams(2800, 1.2));
+    shooterMap.put(2.68, new ShooterParams(2375, 1.09));
+    shooterMap.put(2.9464, new ShooterParams(2500, 1.27));
+    shooterMap.put(3.17, new ShooterParams(2620, 1.2));
+    shooterMap.put(3.4, new ShooterParams(2675, 1.2));
+    shooterMap.put(3.8, new ShooterParams(2775, 1.2));
     shooterMap.put(4.2, new ShooterParams(3250, 1.3));
     shooterMap.put(4.5, new ShooterParams(3450, 1.3));
-    shooterMap.put(4.65, new ShooterParams(3600, 1.4));
-    shooterMap.put(5.2, new ShooterParams(3750, 1.4));
+    shooterMap.put(4.65, new ShooterParams(3775, 1.4));
+    shooterMap.put(5.2, new ShooterParams(3800, 1.4));
     shooterMap.put(6.0, new ShooterParams(4300, 1.5));
     shooterMap.put(7.0, new ShooterParams(4650, 1.6));
     shooterMap.put(8.0, new ShooterParams(5200, 1.7));
@@ -162,7 +163,15 @@ public class Shooter extends SubsystemBase {
             + lateralSpeed * ShooterConstants.kRpmPerMpsLateral;
 
     calculatedRpm = (adjustedParams.rpm + velocityRpmBoost) * ShooterConstants.kRpmScaleFactor;
-    calculatedHeadingDeg = adjustedRelativePosition.getAngle().getDegrees();
+
+    // Compute signed lateral velocity for heading compensation
+    // Cross product of velocity x toHub gives signed lateral component (sign matches needed lead)
+    Translation2d toHub = relativePosition.div(relativePosition.getNorm());
+    double signedLateralSpeed =
+        robotVelocity.getX() * toHub.getY() - robotVelocity.getY() * toHub.getX();
+    double lateralHeadingOffset = signedLateralSpeed * ShooterConstants.kHeadingPerMpsLateral;
+
+    calculatedHeadingDeg = adjustedRelativePosition.getAngle().getDegrees() + lateralHeadingOffset;
   }
 
   public double getCalculatedRpm() {
@@ -199,6 +208,10 @@ public class Shooter extends SubsystemBase {
             .withName("FeederPhase");
 
     return spinUntilUp.andThen(feederPhase).withName("Shooting");
+  }
+
+  public Trigger getIsFlywheelSpinning() {
+    return isFlywheelSpinning;
   }
 
   /** Spin up flywheel using calculatedRpm (no auto-align override), then run feeder. */

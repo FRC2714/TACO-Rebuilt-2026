@@ -133,6 +133,13 @@ public class Intake extends SubsystemBase {
     setConveyorSpeed(ConveyorSetpoints.STOP);
   }
 
+  /** Stop rollers/conveyor but leave intake deployed at intake position. */
+  public void stopAllDeployed() {
+    setPivotPosition(intakePosition);
+    setRollerSpeed(RollerSetpoints.STOP);
+    setConveyorSpeed(ConveyorSetpoints.STOP);
+  }
+
   public Command intakeCommand() {
     return this.runOnce(
             () -> {
@@ -145,7 +152,7 @@ public class Intake extends SubsystemBase {
             Commands.waitUntil(
                 () ->
                     m_pivotEncoder.getPosition()
-                        >= stowPosition + (intakePosition - stowPosition) * 0.3))
+                        >= stowPosition + (intakePosition - stowPosition) * 0.5))
         .andThen(
             this.run(
                 () -> {
@@ -170,6 +177,14 @@ public class Intake extends SubsystemBase {
             () -> setConveyorSpeed(ConveyorSetpoints.INTAKE),
             () -> setConveyorSpeed(ConveyorSetpoints.STOP))
         .withName("Conveyoring");
+  }
+
+  /** Reverses conveyor without claiming Intake subsystem. For unjam during spin-up. */
+  public Command reverseConveyorCommand() {
+    return Commands.startEnd(
+            () -> setConveyorSpeed(ConveyorSetpoints.EXTAKE),
+            () -> setConveyorSpeed(ConveyorSetpoints.STOP))
+        .withName("ReverseConveyor");
   }
 
   /** Runs intake rollers without claiming Intake subsystem. For use in parallel with conveyor. */

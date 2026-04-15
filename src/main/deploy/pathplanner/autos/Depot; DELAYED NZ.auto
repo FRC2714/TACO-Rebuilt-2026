@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "outpost-start-score"
+            "pathName": "D-Shoot Preload NZ"
           }
         },
         {
@@ -17,39 +17,27 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "score-outpost"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "INTAKE"
+            "name": "DEPLOY_INTAKE"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "outpost-score"
+            "pathName": "D-Intake NZ Delayed"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SCORE"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ZERO DRIVER HEADING"
+            "name": "SCORE_NZ"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Alliance Side",
+  "folder": "Neutral Zone",
   "choreoAuto": false
 }

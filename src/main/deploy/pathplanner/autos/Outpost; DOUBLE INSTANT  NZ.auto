@@ -5,15 +5,21 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "DEPLOY_INTAKE"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "O-Shoot Preload NZ"
+            "pathName": "O-Intake NZ + Score"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SCORE_NO_AGITATE"
+            "name": "SCORE_NZ"
           }
         },
         {
@@ -25,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "O-Intake NZ and Score"
+            "pathName": "O-Intake AGAIN NZ + Score"
           }
         },
         {

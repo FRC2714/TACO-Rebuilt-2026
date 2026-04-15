@@ -5,51 +5,45 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "outpost-start-score"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "SCORE_NO_AGITATE"
+            "name": "DEPLOY_INTAKE"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "score-outpost"
+            "pathName": "D-Intake NZ + Score"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "INTAKE"
+            "name": "SCORE_NZ"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DEPLOY_INTAKE"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "outpost-score"
+            "pathName": "D-Intake AGAIN NZ + Score"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SCORE"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ZERO DRIVER HEADING"
+            "name": "SCORE_NZ"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Alliance Side",
+  "folder": "Neutral Zone",
   "choreoAuto": false
 }
